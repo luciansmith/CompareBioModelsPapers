@@ -1,0 +1,332 @@
+BioModels Publication Validation Report
+Generated: 2026-05-29 15:09:45 UTC
+Source: C:\Users\Lucian\Desktop\Biomodels sources\biomd_publication_info.json
+Entries checked: 849
+
+========================================================================
+1. DUPLICATE PMIDs (same PMID under multiple keys)
+========================================================================
+  No duplicates found.
+
+========================================================================
+2. FIELD MISMATCHES (grouped by BioModel ID)
+========================================================================
+
+--- BIOMD0000000021 ---
+[http://identifiers.org/pubmed/10366496]
+  Field 'title': stored='Chaos and birhythmicity in a model for circadian oscillations of the PER and TIM proteins in drosophila'  PubMed='Chaos and birhythmicity in a model for circadian oscillations of the PER and TIM proteins in drosophila.'
+
+--- BIOMD0000000454 ---
+[http://identifiers.org/doi/10.48550/arXiv.1305.6449]
+  CrossRef and PubMed lookup both failed for DOI 10.48550/arXiv.1305.6449
+
+--- BIOMD0000000455 ---
+[http://identifiers.org/doi/10.48550/arXiv.1305.6449]
+  CrossRef and PubMed lookup both failed for DOI 10.48550/arXiv.1305.6449
+
+--- BIOMD0000000456 ---
+[http://identifiers.org/doi/10.48550/arXiv.1305.6449]
+  CrossRef and PubMed lookup both failed for DOI 10.48550/arXiv.1305.6449
+
+--- BIOMD0000000480 ---
+[http://identifiers.org/doi/10.1371/journal.pone.0073365]
+  Field 'journal': stored='PLoS ONE 2013; 8(9): e73365'  PubMed='PloS one'  (abbr='PLoS One')
+[http://identifiers.org/doi/10.1371/journal.pone.0073365]
+  Field 'volume': stored=''  PubMed='8'
+
+--- BIOMD0000000504 ---
+[http://identifiers.org/pubmed/24285357]
+  PubMed fetch failed for PMID 24285357
+
+--- BIOMD0000000568 ---
+[http://identifiers.org/pubmed/25771250]
+  PubMed fetch failed for PMID 25771250
+
+--- BIOMD0000000629 ---
+[http://identifiers.org/doi/10.1039/C6MD00680A]
+  Field 'volume': stored=''  PubMed='8'
+[http://identifiers.org/doi/10.1039/C6MD00680A]
+  Field 'title': stored='The molecular basis of the interactions between synthetic retinoic acid analogues and the retinoic acid receptors'  PubMed='The molecular basis of the interactions between synthetic retinoic acid analogues and the retinoic acid receptors.'
+
+--- BIOMD0000000643 ---
+[http://identifiers.org/doi/10.7554/eLife.24998]
+  Field 'volume': stored=''  PubMed='6'
+[http://identifiers.org/doi/10.7554/eLife.24998]
+  Field 'title': stored='Reciprocal regulation of ARPP-16 by PKA and MAST-3 kinases provides a cAMP-regulated switch in protein phosphatase 2A inhibition'  PubMed='Reciprocal regulation of ARPP-16 by PKA and MAST3 kinases provides a cAMP-regulated switch in protein phosphatase 2A inhibition.'
+
+--- BIOMD0000000644 ---
+[http://identifiers.org/doi/10.7554/eLife.24998]
+  Field 'volume': stored=''  PubMed='6'
+[http://identifiers.org/doi/10.7554/eLife.24998]
+  Field 'title': stored='Reciprocal regulation of ARPP-16 by PKA and MAST-3 kinases provides a cAMP-regulated switch in protein phosphatase 2A inhibition'  PubMed='Reciprocal regulation of ARPP-16 by PKA and MAST3 kinases provides a cAMP-regulated switch in protein phosphatase 2A inhibition.'
+
+--- BIOMD0000000645 ---
+[http://identifiers.org/doi/10.7554/eLife.24998]
+  Field 'volume': stored=''  PubMed='6'
+[http://identifiers.org/doi/10.7554/eLife.24998]
+  Field 'title': stored='Reciprocal regulation of ARPP-16 by PKA and MAST-3 kinases provides a cAMP-regulated switch in protein phosphatase 2A inhibition'  PubMed='Reciprocal regulation of ARPP-16 by PKA and MAST3 kinases provides a cAMP-regulated switch in protein phosphatase 2A inhibition.'
+
+--- BIOMD0000000716 ---
+[http://identifiers.org/doi/10.1016/j.idm.2018.03.004]
+  Field 'journal': stored='Elsevier BV'  PubMed='Infectious Disease Modelling'  (abbr='Infect Dis Model')
+[http://identifiers.org/doi/10.1016/j.idm.2018.03.004]
+  Field 'title': stored='Transmission dynamics and control strategies assessment of avian influenza A (H5N6) in the Philippines'  PubMed='Transmission dynamics and control strategies assessment of avian influenza A (H5N6) in the Philippines.'
+
+--- BIOMD0000000717 ---
+[http://identifiers.org/doi/10.1016/j.idm.2018.03.004]
+  Field 'journal': stored='Elsevier BV'  PubMed='Infectious Disease Modelling'  (abbr='Infect Dis Model')
+[http://identifiers.org/doi/10.1016/j.idm.2018.03.004]
+  Field 'title': stored='Transmission dynamics and control strategies assessment of avian influenza A (H5N6) in the Philippines'  PubMed='Transmission dynamics and control strategies assessment of avian influenza A (H5N6) in the Philippines.'
+
+--- BIOMD0000000741 ---
+[http://identifiers.org/doi/10.1186/s12967-018-1432-8]
+  Field 'volume': stored=''  PubMed='16'
+[http://identifiers.org/doi/10.1186/s12967-018-1432-8]
+  Field 'title': stored='Improving cancer detection through combinations of cancer and immune biomarkers: a modelling approach'  PubMed='Improving cancer detection through combinations of cancer and immune biomarkers: a modelling approach.'
+
+--- BIOMD0000000743 ---
+[http://identifiers.org/doi/10.1016/j.jtbi.2018.08.037]
+  Field 'title': stored='Methods for determining key components in a mathematical model for tumor–immune dynamics in multiple myeloma'  PubMed='Methods for determining key components in a mathematical model for tumor-immune dynamics in multiple myeloma.'
+
+--- BIOMD0000000744 ---
+[http://identifiers.org/doi/10.1007/s11538-019-00591-3]
+  Field 'title': stored='Modeling Pancreatic Cancer Dynamics with Immunotherapy'  PubMed='Modeling Pancreatic Cancer Dynamics with Immunotherapy.'
+
+--- BIOMD0000000745 ---
+[http://identifiers.org/doi/10.1093/imammb/dqy014]
+  Field 'journal': stored='Mathematical Medicine and Biology: A Journal of the IMA'  PubMed='Mathematical medicine and biology : a journal of the IMA'  (abbr='Math Med Biol')
+[http://identifiers.org/doi/10.1093/imammb/dqy014]
+  Field 'year': stored='2018'  PubMed='2019'
+[http://identifiers.org/doi/10.1093/imammb/dqy014]
+  Field 'volume': stored=''  PubMed='36'
+[http://identifiers.org/doi/10.1093/imammb/dqy014]
+  Field 'title': stored='Mathematical modelling of trastuzumab-induced immune response in an in vivo murine model of HER2+ breast cancer'  PubMed='Mathematical modelling of trastuzumab-induced immune response in an in vivo murine model of HER2+ breast cancer.'
+
+--- BIOMD0000000769 ---
+[http://identifiers.org/pubmed/28219660]
+  Field 'title': stored='Modelling and investigation of the CD4<sup>+</sup> T cells - Macrophages paradox in melanoma immunotherapies.'  PubMed='Modelling and investigation of the CD4+ T cells - Macrophages paradox in melanoma immunotherapies.'
+
+--- BIOMD0000000770 ---
+[http://identifiers.org/pubmed/28219660]
+  Field 'title': stored='Modelling and investigation of the CD4<sup>+</sup> T cells - Macrophages paradox in melanoma immunotherapies.'  PubMed='Modelling and investigation of the CD4+ T cells - Macrophages paradox in melanoma immunotherapies.'
+
+--- BIOMD0000000778 ---
+[http://identifiers.org/pubmed/29250133]
+  Field 'title': stored='Periodically Pulsed Immunotherapy in a Mathematical Model of Tumor, CD4<sup>+</sup> T Cells, and Antitumor Cytokine Interactions.'  PubMed='Periodically Pulsed Immunotherapy in a Mathematical Model of Tumor, CD4+ T Cells, and Antitumor Cytokine Interactions.'
+
+--- BIOMD0000000856 ---
+[http://identifiers.org/doi/10.1371/journal.pcbi.1006548]
+  Field 'title': stored='Dilution and titration of cell-cycle regulators may control cell size in budding yeast'  PubMed='Dilution and titration of cell-cycle regulators may control cell size in budding yeast.'
+
+--- BIOMD0000000866 ---
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'volume': stored=''  PubMed='116'
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'title': stored='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB'  PubMed='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB.'
+
+--- BIOMD0000000868 ---
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'volume': stored=''  PubMed='116'
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'title': stored='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB'  PubMed='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB.'
+
+--- BIOMD0000000869 ---
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'volume': stored=''  PubMed='116'
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'title': stored='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB'  PubMed='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB.'
+
+--- BIOMD0000000870 ---
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'volume': stored=''  PubMed='116'
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'title': stored='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB'  PubMed='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB.'
+
+--- BIOMD0000000871 ---
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'volume': stored=''  PubMed='116'
+[http://identifiers.org/doi/10.1073/pnas.1816000116]
+  Field 'title': stored='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB'  PubMed='Substrate complex competition is a regulatory motif that allows NFκB RelA to license but not amplify NFκB RelB.'
+
+--- BIOMD0000000872 ---
+[http://identifiers.org/doi/10.1371/journal.pone.0168133]
+  Field 'year': stored='2019'  PubMed='2017'
+[http://identifiers.org/doi/10.1371/journal.pone.0168133]
+  Field 'volume': stored=''  PubMed='12'
+[http://identifiers.org/doi/10.1371/journal.pone.0168133]
+  Field 'title': stored='Modeling the mechanisms by which HIV-associated immunosuppression influences HPV persistence at the oral mucosa'  PubMed='Modeling the Mechanisms by Which HIV-Associated Immunosuppression Influences HPV Persistence at the Oral Mucosa.'
+
+--- BIOMD0000000932 ---
+[http://identifiers.org/pubmed/32257302]
+  Field 'title': stored='Differential equation-based minimal model describing metabolic oscillations in <i>Bacillus subtilis</i> biofilms.'  PubMed='Differential equation-based minimal model describing metabolic oscillations in Bacillus subtilis biofilms.'
+
+--- BIOMD0000000934 ---
+[http://identifiers.org/pubmed/28649434]
+  Field 'title': stored='A Clb/Cdk1-mediated regulation of Fkh2 synchronizes <i>CLB</i> expression in the budding yeast cell cycle.'  PubMed='A Clb/Cdk1-mediated regulation of Fkh2 synchronizes CLB expression in the budding yeast cell cycle.'
+
+--- BIOMD0000000989 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000000990 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000000994 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000000995 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000000996 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000000997 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000000998 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000000999 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000001000 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000001001 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000001002 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000001003 ---
+[http://identifiers.org/pubmed/29371237]
+  Field 'title': stored='Cell-specific responses to the cytokine TGFb are determined by variability in protein levels.'  PubMed='Cell-specific responses to the cytokine TGFβ are determined by variability in protein levels.'
+
+--- BIOMD0000001019 ---
+[http://identifiers.org/pubmed/34208323]
+  Field 'title': stored='CART<i>math</i>-A Mathematical Model of CAR-T Immunotherapy in Preclinical Studies of Hematological Cancers.'  PubMed='CARTmath-A Mathematical Model of CAR-T Immunotherapy in Preclinical Studies of Hematological Cancers.'
+
+--- BIOMD0000001020 ---
+[http://identifiers.org/pubmed/34208323]
+  Field 'title': stored='CART<i>math</i>-A Mathematical Model of CAR-T Immunotherapy in Preclinical Studies of Hematological Cancers.'  PubMed='CARTmath-A Mathematical Model of CAR-T Immunotherapy in Preclinical Studies of Hematological Cancers.'
+
+--- BIOMD0000001026 ---
+[http://identifiers.org/doi/10.1007/s40262-021-01058-2]
+  Field 'year': stored='2021'  PubMed='2022'
+[http://identifiers.org/doi/10.1007/s40262-021-01058-2]
+  Field 'volume': stored=''  PubMed='61'
+
+--- BIOMD0000001027 ---
+[http://identifiers.org/doi/10.1371/journal.pone.0249594]
+  Field 'title': stored='Physiologically based metformin pharmacokinetics model of mice and scale-up to humans for the estimation of concentrations in various tissues'  PubMed='Physiologically based metformin pharmacokinetics model of mice and scale-up to humans for the estimation of concentrations in various tissues.'
+
+--- BIOMD0000001028 ---
+[http://identifiers.org/doi/10.1371/journal.pone.0249594]
+  Field 'title': stored='Physiologically based metformin pharmacokinetics model of mice and scale-up to humans for the estimation of concentrations in various tissues'  PubMed='Physiologically based metformin pharmacokinetics model of mice and scale-up to humans for the estimation of concentrations in various tissues.'
+
+--- BIOMD0000001029 ---
+[http://identifiers.org/doi/10.1371/journal.pone.0249594]
+  Field 'title': stored='Physiologically based metformin pharmacokinetics model of mice and scale-up to humans for the estimation of concentrations in various tissues'  PubMed='Physiologically based metformin pharmacokinetics model of mice and scale-up to humans for the estimation of concentrations in various tissues.'
+
+--- BIOMD0000001039 ---
+[http://identifiers.org/doi/10.1371/journal.pone.0249594]
+  Field 'title': stored='Physiologically based metformin pharmacokinetics model of mice and scale-up to humans for the estimation of concentrations in various tissues'  PubMed='Physiologically based metformin pharmacokinetics model of mice and scale-up to humans for the estimation of concentrations in various tissues.'
+
+--- BIOMD0000001040 ---
+[http://identifiers.org/doi/10.1007/s40262-021-01058-2]
+  Field 'year': stored='2021'  PubMed='2022'
+[http://identifiers.org/doi/10.1007/s40262-021-01058-2]
+  Field 'volume': stored=''  PubMed='61'
+
+--- BIOMD0000001042 ---
+[http://identifiers.org/pubmed/32148558]
+  Field 'title': stored='Mathematical Modelling for the Role of CD4<sup>+</sup>T Cells in Tumor-Immune Interactions.'  PubMed='Mathematical Modelling for the Role of CD4+T Cells in Tumor-Immune Interactions.'
+
+--- BIOMD0000001058 ---
+[http://identifiers.org/doi/10.1016/j.cub.2022.04.016]
+  Field 'volume': stored=''  PubMed='32'
+
+--- BIOMD0000001062 ---
+[http://identifiers.org/pubmed/33672760]
+  Field 'title': stored='Development of a Genome-Scale Metabolic Model and Phenome Analysis of the Probiotic <i>Escherichia coli</i> Strain Nissle 1917.'  PubMed='Development of a Genome-Scale Metabolic Model and Phenome Analysis of the Probiotic Escherichia coli Strain Nissle 1917.'
+
+--- BIOMD0000001065 ---
+[http://identifiers.org/doi/10.1038/35018085]
+  Field 'title': stored='The segment polarity network is a robust developmental module'  PubMed='The segment polarity network is a robust developmental module.'
+
+--- BIOMD0000001070 ---
+[http://identifiers.org/doi/10.48550/arXiv.2208.06073]
+  CrossRef and PubMed lookup both failed for DOI 10.48550/arXiv.2208.06073
+
+--- BIOMD0000001081 ---
+[http://identifiers.org/doi/10.3390/microorganisms8030437]
+  Field 'title': stored='Genome-Scale Metabolic Model Reconstruction and in Silico Investigations of Methane Metabolism in <i>Methylosinus trichosporium</i> OB3b.'  PubMed='Genome-Scale Metabolic Model Reconstruction and in Silico Investigations of Methane Metabolism in Methylosinus trichosporium OB3b.'
+
+--- BIOMD0000001085 ---
+[http://identifiers.org/doi/10.3389/fgene.2018.00121]
+  Field 'title': stored='iCN718, an Updated and Improved Genome-Scale Metabolic Network Reconstruction of <i>Acinetobacter baumannii</i> AYE.'  PubMed='iCN718, an Updated and Improved Genome-Scale Metabolic Network Reconstruction of Acinetobacter baumannii AYE.'
+
+--- BIOMD0000001086 ---
+[http://identifiers.org/doi/10.3389/fgene.2020.00116]
+  Field 'title': stored='Reconstruction and Validation of a Genome-Scale Metabolic Model of <i>Streptococcus oralis</i> (iCJ415), a Human Commensal and Opportunistic Pathogen.'  PubMed='Reconstruction and Validation of a Genome-Scale Metabolic Model of Streptococcus oralis (iCJ415), a Human Commensal and Opportunistic Pathogen.'
+
+--- BIOMD0000001090 ---
+[http://identifiers.org/pubmed/31293525]
+  Field 'title': stored='iDS372, a Phenotypically Reconciled Model for the Metabolism of <i>Streptococcus pneumoniae</i> Strain R6.'  PubMed='iDS372, a Phenotypically Reconciled Model for the Metabolism of Streptococcus pneumoniae Strain R6.'
+
+--- BIOMD0000001091 ---
+[http://identifiers.org/pubmed/32635563]
+  Field 'title': stored='A Genome-Scale Metabolic Model of 2,3-Butanediol Production by Thermophilic Bacteria <i>Geobacillus icigianus</i>.'  PubMed='A Genome-Scale Metabolic Model of 2,3-Butanediol Production by Thermophilic Bacteria Geobacillus icigianus.'
+
+--- BIOMD0000001100 ---
+[http://identifiers.org/doi/10.1016/j.vascn.2022.107172]
+  Field 'volume': stored=''  PubMed='115'
+
+--- BIOMD0000001102 ---
+[http://identifiers.org/doi/10.1038/s44320-023-00007-4]
+  Field 'volume': stored=''  PubMed='20'
+
+========================================================================
+3. PREPRINTS WITH KNOWN PUBLISHED VERSIONS
+========================================================================
+
+BioModels where the stored entry is a preprint that has since been published:
+NOTE: Corrected JSON retains preprint metadata. Review manually.
+
+  BIOMD0000000742
+    Preprint DOI  : 10.1101/498741
+    Published DOI : 10.1016/j.jtbi.2020.110185
+    Published in  : Journal of Theoretical Biology
+    Published year: 2020
+
+  BIOMD0000000926
+    Preprint DOI  : 10.1101/565531
+    Published DOI : 10.1016/j.jtbi.2019.109999
+    Published in  : Journal of Theoretical Biology
+    Published year: 2019
+
+
+BioModels with preprint entries (no published version found yet):
+  BIOMD0000000502  —  preprint DOI: 10.7287/peerj.preprints.146v2
+  BIOMD0000000503  —  preprint DOI: 10.7287/peerj.preprints.146v2
+  BIOMD0000000837  —  preprint DOI: 10.1101/049908
+  BIOMD0000001101  —  preprint DOI: 10.7554/eLife.93002.2
+
+========================================================================
+SUMMARY
+========================================================================
+  Entries checked          : 849
+  Duplicate PMIDs          : 0
+  BioModels with issues    : 61
+  Preprints (pub. known)   : 2
+  Preprints (no pub. ver.) : 4
