@@ -227,14 +227,27 @@ def load_tracking():
     return json.loads(TRACKING_FILE.read_text()) if TRACKING_FILE.exists() else {}
 
 def save_tracking(tracking, pmid):
-    """Lock the tracking file, read it, update just this entry, write, unlock."""
+    """Lock the tracking file, read it, update just this entry, write atomically, unlock."""
+    import tempfile, os
     print("    [tracking] acquiring lock ...", end="", flush=True)
     _acquire_lock()
     try:
         print(" writing ...", end="", flush=True)
         on_disk = json.loads(TRACKING_FILE.read_text()) if TRACKING_FILE.exists() else {}
         on_disk[pmid] = tracking[pmid]
-        TRACKING_FILE.write_text(json.dumps(on_disk, indent=2))
+        # Write to a temp file in the same directory, then rename — atomic on POSIX,
+        # best-effort on Windows (os.replace is atomic on Windows NTFS too).
+        tmp_fd, tmp_path = tempfile.mkstemp(dir=SCRIPT_DIR, suffix=".tmp")
+        try:
+            with os.fdopen(tmp_fd, "w") as f:
+                f.write(json.dumps(on_disk, indent=2))
+            os.replace(tmp_path, TRACKING_FILE)
+        except Exception:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
     finally:
         _release_lock()
         print(" done.")
@@ -875,6 +888,14 @@ def _follow_to_pdf(url, label, path, verbose=False, sess=None):
             except Exception as e_j:
                 vlog(f"LibKey JSON probe error: {e_j}")
 
+        # Landed on a Primo/ExLibris OpenURL resolver page.
+        # Primo is an Angular SPA — the shell HTML has no publisher links.
+        # We can't resolve it without a browser, so bail early.
+        if (r.status_code == 200
+                and "primo.exlibrisgroup.com" in r.url
+                and "text/html" in r.headers.get("content-type", "")):
+            vlog(f"Primo/ExLibris SPA ({len(r.content)} bytes) — requires JS, skipping")
+
         if (r.status_code == 200
                 and "libkey.io" in r.url
                 and "text/html" in r.headers.get("content-type", "")):
@@ -1001,35 +1022,29 @@ def _follow_to_pdf(url, label, path, verbose=False, sess=None):
     return None
 
 
-def try_libkey(pmid_numeric, doi, path, verbose=False):
+def try_ebsco(pmid_numeric, doi, path, verbose=False):
     """
-    Try UW Library's LibKey / Third Iron resolver.
-    Requires UW VPN in full-tunnel mode.
+    Try EBSCO Research full-text search API (UW Library).
+    Requires SESSION_ID + SESSION_MAP + EBSCO_AFFILIATION cookies in cookies.txt.
+    Refresh cookies.txt when SESSION_ID expires (~28 h) via Cookie-Editor on
+    research.ebsco.com.
 
-    Strategy A: query the Third Iron API by DOI → get fullTextFile URL directly.
-    Strategy B: query by PMID → get fullTextFile URL.
-    Strategy C: fall back to scraping the libkey.io article page (SPA — usually empty).
-    Then follow the full-text URL through auth redirects, handling EBSCO viewer.
+    Queries by DOI first, then PMID; fetches PDF via the v2-pdf linkprocessor.
     """
     if not pmid_numeric and not doi:
         return None
 
     def vlog(msg):
         if verbose:
-            print(f"\n      [libkey] {msg}")
+            print(f"\n      [ebsco] {msg}")
 
     EBSCO_OPID = "2onyl7"
 
-    # ── Strategy A: EBSCO Research search API ────────────────────────────────
     # Real API URLs captured from Chrome DevTools while searching EBSCO Research:
     #   POST /api/search/v1/search?applyAllLimiters=true&...  → returns results
     #         with recordId (= content_id) for each hit
     #   GET  /api/search/v2/details?recordId={cid}&profileIdentifier=2onyl7&...
     # We POST a DOI/PMID query, extract the first recordId, then call v2-pdf.
-    # Requires SESSION_ID + SESSION_MAP + EBSCO_AFFILIATION in cookies.txt.
-    # Refresh cookies.txt when SESSION_ID expires (~28h) via Cookie-Editor on
-    # research.ebsco.com.
-    ebsco_sess = make_cookie_session("")   # picks up all cookies.txt entries
     EBSCO_SEARCH_URL = (
         "https://research.ebsco.com/api/search/v1/search"
         "?applyAllLimiters=true&includeSavedItems=false"
@@ -1053,10 +1068,9 @@ def try_libkey(pmid_numeric, doi, path, verbose=False):
             {"query": f"pmid:{pmid_numeric}", "profileIdentifier": EBSCO_OPID}
         )
 
-    # EBSCO search — try each query body in turn.
     # The key cookies (SESSION_ID, SESSION_MAP, EBSCO_AFFILIATION) last ~28 h;
     # refresh them via Cookie-Editor on research.ebsco.com when they expire.
-    ebsco_sess = make_cookie_session("")
+    ebsco_sess = make_cookie_session("research.ebsco.com")
     _ebsco_auth_failures = 0
 
     for body in search_bodies:
@@ -1075,8 +1089,8 @@ def try_libkey(pmid_numeric, doi, path, verbose=False):
                     items = jdata.get("search", {}).get("items", [])
                     vlog(f"EBSCO search items={len(items)}")
                     if verbose and items:
-                        print(f"      [libkey] EBSCO first item keys: {list(items[0].keys())}")
-                        print(f"      [libkey] EBSCO first item snippet: {json.dumps(items[0])[:600]}")
+                        print(f"      [ebsco] EBSCO first item keys: {list(items[0].keys())}")
+                        print(f"      [ebsco] EBSCO first item snippet: {json.dumps(items[0])[:600]}")
                     cids = []
                     for item in items[:5]:
                         for fld in ("id", "recordId", "sourceRecordId",
@@ -1093,7 +1107,50 @@ def try_libkey(pmid_numeric, doi, path, verbose=False):
                         for m in re.finditer(pat, rs.text):
                             cids.append(m.group(1))
 
+                # Collect full-text links from the result for fallback.
+                # EBSCO's links dict has many buckets; only fullText/customLink
+                # entries are useful — skip export/drive/email/bib/print links.
+                _SKIP_LINK_TYPES = {
+                    "oneDriveUpload", "driveUpload", "driveUploadStatus",
+                    "csv", "email", "easybib", "refworks", "endnote",
+                    "noodletools", "ris", "cover", "thumb",
+                }
+                _FULLTEXT_BUCKETS = {
+                    "fullTextLinks", "v2-fullTextAndCustomLinks",
+                    "fullTextAndCustomLinks", "cardCallToActionLinks",
+                    "plinks", "providerLinks",
+                }
+                item_links = []
+                for item in items[:5]:
+                    raw_links = item.get("links") or {}
+                    if isinstance(raw_links, dict):
+                        # Prefer fulltext-specific buckets; fall back to all buckets
+                        buckets = [(k, v) for k, v in raw_links.items()
+                                   if k in _FULLTEXT_BUCKETS and isinstance(v, list)]
+                        if not buckets:
+                            buckets = [(k, v) for k, v in raw_links.items()
+                                       if isinstance(v, list)]
+                        for _bk, entries in buckets:
+                            for lnk in entries:
+                                if isinstance(lnk, str):
+                                    href = lnk
+                                    ltype = ""
+                                elif isinstance(lnk, dict):
+                                    if lnk.get("type") in _SKIP_LINK_TYPES:
+                                        continue
+                                    href = lnk.get("url") or lnk.get("href") or lnk.get("link") or ""
+                                    ltype = lnk.get("type", "")
+                                else:
+                                    continue
+                                if href and not href.startswith("http"):
+                                    href = "https://research.ebsco.com" + href
+                                if href and href.startswith("http") and href not in item_links:
+                                    item_links.append(href)
+                if verbose:
+                    print(f"      [ebsco] item links extracted: {item_links[:8]}")
+
                 vlog(f"EBSCO search cids={cids}")
+                v2pdf_404 = False
                 for cid in cids:
                     for intent in ("view", "download"):
                         eu = (
@@ -1110,6 +1167,50 @@ def try_libkey(pmid_numeric, doi, path, verbose=False):
                         if r2.status_code == 200 and is_pdf(r2.content):
                             path.write_bytes(r2.content)
                             return eu
+                        if r2.status_code == 404:
+                            v2pdf_404 = True
+
+                # v2-pdf unavailable — try the details API for a link-resolver URL
+                if v2pdf_404 and cids:
+                    for cid in cids:
+                        try:
+                            first_item = next((i for i in items if i.get("id") == cid), items[0] if items else None)
+                            db = (first_item or {}).get("shortDbName") or (first_item or {}).get("shortDBName") or ""
+                            det_url = (
+                                f"https://research.ebsco.com/api/search/v2/details"
+                                f"?recordId={cid}&profileIdentifier={EBSCO_OPID}"
+                                + (f"&db={db}" if db else "")
+                            )
+                            rd = ebsco_sess.get(det_url, timeout=20,
+                                                headers={"Accept": "application/json",
+                                                         "Referer": f"https://research.ebsco.com/c/{EBSCO_OPID}/"})
+                            vlog(f"details API status={rd.status_code} ct={rd.headers.get('content-type','')} size={len(rd.content)}")
+                            if rd.status_code == 200 and "json" in rd.headers.get("content-type", ""):
+                                if verbose:
+                                    print(f"      [ebsco] details snippet: {rd.text[:800]}")
+                                # Hunt for any fulltext/link-resolver URL in the details JSON
+                                for pat in (r'"(?:fullText|fullTextUrl|linkResolverUrl|pdfUrl|bestFullTextUrl|url)"\s*:\s*"([^"]+)"',
+                                            r'https?://[^\s"\'<>]+\.pdf[^\s"\'<>]*'):
+                                    for m in re.finditer(pat, rd.text):
+                                        candidate = m.group(1) if m.lastindex else m.group(0)
+                                        candidate = candidate.replace("\\u002F", "/").replace("\\/", "/")
+                                        if candidate.startswith("http"):
+                                            vlog(f"details link candidate: {candidate}")
+                                            result = _follow_to_pdf(candidate, "ebsco-details-link", path, verbose, sess=ebsco_sess)
+                                            if result and result is not _NO_SUBSCRIPTION:
+                                                return result
+                        except Exception as e_det:
+                            vlog(f"details API error: {e_det}")
+
+                # v2-pdf unavailable — try publisher links embedded in the result
+                if v2pdf_404 and item_links:
+                    vlog(f"v2-pdf returned 404; trying {len(item_links)} item link(s)")
+                    for href in item_links[:8]:
+                        vlog(f"trying item link: {href}")
+                        result = _follow_to_pdf(href, "ebsco-item-link", path, verbose, sess=ebsco_sess)
+                        if result and result is not _NO_SUBSCRIPTION:
+                            return result
+
                 if cids:
                     break  # tried all cids from this query; move to next body
             else:
@@ -1130,7 +1231,25 @@ def try_libkey(pmid_numeric, doi, path, verbose=False):
             "       cookie, click Export, choose Netscape format, append to cookies.txt.)",
         )
 
-    # ── Strategy B/C: Third Iron v2 API (cookie-authenticated) ───────────────
+    return None
+
+
+def try_libkey(pmid_numeric, doi, path, verbose=False):
+    """
+    Try UW Library's LibKey / ThirdIron link resolver.
+    Requires UW VPN in full-tunnel mode.
+
+    Queries the ThirdIron public and authenticated v2 APIs by PMID and DOI,
+    then follows the returned fullTextFile / contentLocation URL through auth
+    redirects, handling the EBSCO viewer if needed.
+    """
+    if not pmid_numeric and not doi:
+        return None
+
+    def vlog(msg):
+        if verbose:
+            print(f"\n      [libkey] {msg}")
+
     # The actual API LibKey uses in the browser is /v2/ (not /public/v1/).
     # Auth is via session cookies from libkey.io / thirdiron.com — no API key
     # in the URL.  Re-export cookies.txt from Chrome after visiting
@@ -1843,9 +1962,6 @@ def try_direct_doi(doi, path, verbose=False):
             elif r_ez.status_code == 200 and is_pdf(r_ez.content):
                 path.write_bytes(r_ez.content)
                 return r_ez.url, None
-            elif r_ez.status_code == 200 and is_pdf(r_ez.content):
-                path.write_bytes(r_ez.content)
-                return r_ez.url, None
             elif r_ez.status_code == 200:
                 # Try publisher PDF patterns on the EZProxy-resolved page
                 for domain, pdf_fn in PUBLISHER_PDF_PATTERNS.items():
@@ -1876,13 +1992,17 @@ def try_direct_doi(doi, path, verbose=False):
     return None, None
 
 
-def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=False):
-    filename = safe_filename(pmid, title)
-    path     = OUTPUT_DIR / filename
-    pmcid    = pmc_info.get("pmcid")
-    doi      = pmc_info.get("doi")
-
+def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=False, ebsco_only=False):
+    pmcid        = pmc_info.get("pmcid")
+    doi          = pmc_info.get("doi")
     pmid_numeric = pmc_info.get("pmid_numeric") or pmid
+
+    # Skip entirely (no output, no tracking) if pmc_only and no PMCID
+    if pmc_only and not pmcid:
+        return False
+
+    filename     = safe_filename(pmid_numeric, title)
+    path         = OUTPUT_DIR / filename
     print(f"\n  PMID {pmid}  PMC {pmcid or '---'}  DOI {doi or '---'}")
     print(f"  {title[:80]}")
 
@@ -1898,6 +2018,20 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
         print("X")
 
     if pmc_only:
+        return False
+
+    if ebsco_only:
+        # Jump straight to EBSCO; skip everything else
+        print("    [3] EBSCO ...        ", end="", flush=True)
+        time.sleep(GENERAL_DELAY)
+        src = try_ebsco(pmid_numeric, doi, path, verbose=verbose)
+        if src:
+            print("OK")
+            tracking[pmid] = {"status": "downloaded", "filename": filename,
+                               "source": "ebsco", "doi": doi, "pmcid": pmcid}
+            return True
+        print("X")
+        tracking[pmid] = {"status": "failed", "doi": doi, "pmcid": pmcid}
         return False
 
     # 2. PubMed page (may reveal PMC ID or free links) ------------------------
@@ -1922,8 +2056,20 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
     else:
         print("X")
 
-    # 3. LibKey (UW library resolver -- needs UW VPN full-tunnel) -------------
-    print("    [3] LibKey ...       ", end="", flush=True)
+    # 3. EBSCO Research (UW Library full-text database) -----------------------
+    print("    [3] EBSCO ...        ", end="", flush=True)
+    time.sleep(GENERAL_DELAY)
+    src = try_ebsco(pmid_numeric, doi, path, verbose=verbose)
+    if src:
+        print("OK")
+        tracking[pmid] = {"status": "downloaded", "filename": filename,
+                           "source": "ebsco", "doi": doi, "pmcid": pmcid}
+        return True
+    else:
+        print("X")
+
+    # 4. LibKey / ThirdIron (UW library link resolver -- needs UW VPN) --------
+    print("    [4] LibKey ...       ", end="", flush=True)
     time.sleep(GENERAL_DELAY)
     src = try_libkey(pmid_numeric, doi, path, verbose=verbose)
     if src is _NO_SUBSCRIPTION:
@@ -1938,9 +2084,9 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
     else:
         print("X")
 
-    # 4. Unpaywall ------------------------------------------------------------
+    # 5. Unpaywall ------------------------------------------------------------
     if doi:
-        print("    [4] Unpaywall ...    ", end="", flush=True)
+        print("    [5] Unpaywall ...    ", end="", flush=True)
         time.sleep(GENERAL_DELAY)
         src = try_unpaywall(doi, path)
         if src:
@@ -1950,9 +2096,9 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
             return True
         print("X")
 
-    # 4b. Semantic Scholar open-access PDF ------------------------------------
+    # 5b. Semantic Scholar open-access PDF ------------------------------------
     if doi or title:
-        print("    [4b] Semantic Scholar", end="", flush=True)
+        print("    [5b] Semantic Scholar", end="", flush=True)
         time.sleep(GENERAL_DELAY)
         src = try_semantic_scholar(doi, title, path, verbose=verbose)
         if src:
@@ -1962,9 +2108,9 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
             return True
         print(" X")
 
-    # 4c. Google Scholar (scholarly) ------------------------------------------
+    # 5c. Google Scholar (scholarly) ------------------------------------------
     if HAS_SCHOLARLY:
-        print("    [4c] Google Scholar  ", end="", flush=True)
+        print("    [5c] Google Scholar  ", end="", flush=True)
         time.sleep(2.0)
         src = try_scholarly(doi, title, path)
         if src:
@@ -1974,9 +2120,9 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
             return True
         print(" X")
 
-    # 5. Direct DOI (UW VPN + EZProxy) ----------------------------------------
+    # 6. Direct DOI (UW VPN + EZProxy) ----------------------------------------
     if doi:
-        print("    [5] Direct DOI ...   ", end="", flush=True)
+        print("    [6] Direct DOI ...   ", end="", flush=True)
         time.sleep(GENERAL_DELAY)
         src, manual_url = try_direct_doi(doi, path, verbose=verbose)
         if src:
@@ -2008,16 +2154,19 @@ def main():
                         help="Process all remaining papers (ignores --count).")
     parser.add_argument("--pmc-only", action="store_true",
                         help="Only try PMC (skip LibKey, Unpaywall, direct DOI).")
+    parser.add_argument("--ebsco-only", action="store_true",
+                        help="Only try EBSCO (skip PMC, PubMed page, LibKey, etc.).")
     parser.add_argument("--debug", action="store_true",
                         help="Enable verbose debug output for each strategy.")
     parser.add_argument(
         "--skip",
-        choices=["tried", "auth", "none"],
+        choices=["tried", "auth", "downloaded", "none"],
         default="tried",
         help=(
-            "tried: skip all previously attempted PMIDs (default).\n"
-            "auth:  skip only auth-blocked PMIDs; retry other failures.\n"
-            "none:  reprocess everything."
+            "tried:       skip all previously attempted PMIDs (default).\n"
+            "downloaded:  skip only successfully downloaded PMIDs.\n"
+            "auth:        skip only auth-blocked PMIDs; retry other failures.\n"
+            "none:        reprocess everything."
         ),
     )
     args = parser.parse_args()
@@ -2031,6 +2180,8 @@ def main():
     if args.skip == "tried":
         skip_statuses = {"downloaded", "failed", "needs_manual",
                          "no_subscription", "no_pmcid"}
+    elif args.skip == "downloaded":
+        skip_statuses = {"downloaded"}
     elif args.skip == "auth":
         skip_statuses = {"downloaded", "no_subscription"}
 
@@ -2043,21 +2194,39 @@ def main():
     count = len(papers) if args.all else args.count
     batch = papers[start: start + count]
 
-    print(f"Processing {len(batch)} papers "
-          f"(start={start}, total_eligible={len(papers)}) ...")
+    print(f"Papers to process : {len(batch)}")
+    print(f"Output directory  : {OUTPUT_DIR}")
+    print(f"Tracking file     : {TRACKING_FILE}")
 
     ok = 0
+    failed = 0
     for pmid, info in batch:
-        title    = info.get("title", "")
-        pmc_info = info.get("pmc_info") or {}
+        title     = info.get("title", "")
+        accession = info.get("accession") or ""
+        # Strip URI prefix if the key is a full identifiers.org URI
+        numeric_id = re.sub(r'^https?://identifiers\.org/pubmed/', '', pmid)
+        numeric_id = re.sub(r'^https?://identifiers\.org/doi/', '', numeric_id)
+
+        # Look up PMC ID and DOI via NCBI (idconv → esummary → elink)
+        pmc_map = get_pmc_info([accession or numeric_id], debug=args.debug)
+        pmc_info = pmc_map.get(accession or numeric_id) or {}
+        # Ensure pmid_numeric is set so try_libkey / try_pubmed_page work
+        if "pmid_numeric" not in pmc_info:
+            pmc_info["pmid_numeric"] = numeric_id
+
+        tracking_before = {pmid: tracking[pmid]} if pmid in tracking else {}
         success  = download_paper(
             pmid, title, pmc_info, tracking,
             verbose=args.debug,
             pmc_only=args.pmc_only,
+            ebsco_only=args.ebsco_only,
         )
         if success:
             ok += 1
-        save_tracking(tracking, pmid)
+            save_tracking(tracking, pmid)
+        elif pmid in tracking and tracking[pmid] != tracking_before.get(pmid):
+            failed += 1
+            save_tracking(tracking, pmid)
 
     print(f"\nDone. {ok}/{len(batch)} downloaded.")
     already = sum(1 for v in tracking.values() if v.get("status") == "downloaded")
