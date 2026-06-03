@@ -258,9 +258,10 @@ def is_pdf(data, min_size=5_000):
     return len(data) >= min_size and data[:4] == b"%PDF"
 
 def safe_filename(pmid, title):
+    clean_id = re.sub(r"[^\w.-]", "_", str(pmid))   # sanitize slashes etc.
     clean = re.sub(r"[^\w\s-]", "_", title[:70]).strip()
     clean = re.sub(r"\s+", "_", clean)
-    return f"PMID{pmid}_{clean}.pdf"
+    return f"PMID{clean_id}_{clean}.pdf"
 
 # ── NCBI ID conversion ────────────────────────────────────────────────────────
 def get_pmc_info(accessions, debug=False):
@@ -360,7 +361,7 @@ def get_pmc_info(accessions, debug=False):
                 r.raise_for_status()
                 if debug:
                     print(f"  [debug] elink({pmid}) status={r.status_code}, body={r.text[:300]}")
-                data = r.json()
+                data = r.json(strict=False)
                 for linkset in data.get("linksets", []):
                     for lsdb in linkset.get("linksetdbs", []):
                         if (lsdb.get("dbto") == "pmc" and
@@ -1165,8 +1166,12 @@ def try_ebsco(pmid_numeric, doi, path, verbose=False):
                         )
                         vlog(f"v2-pdf cid={cid} ({intent}) status={r2.status_code} ct={r2.headers.get('content-type','')} is_pdf={is_pdf(r2.content)}")
                         if r2.status_code == 200 and is_pdf(r2.content):
-                            path.write_bytes(r2.content)
-                            return eu
+                            try:
+                                path.write_bytes(r2.content)
+                                return eu
+                            except Exception as e_w:
+                                vlog(f"write error: {e_w}")
+                                return None
                         if r2.status_code == 404:
                             v2pdf_404 = True
 
@@ -2006,6 +2011,20 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
     print(f"\n  PMID {pmid}  PMC {pmcid or '---'}  DOI {doi or '---'}")
     print(f"  {title[:80]}")
 
+    if ebsco_only:
+        # Jump straight to EBSCO; skip everything else (including PMC)
+        print("    [3] EBSCO ...        ", end="", flush=True)
+        time.sleep(GENERAL_DELAY)
+        src = try_ebsco(pmid_numeric, doi, path, verbose=verbose)
+        if src:
+            print("OK")
+            tracking[pmid] = {"status": "downloaded", "filename": filename,
+                               "source": "ebsco", "doi": doi, "pmcid": pmcid}
+            return True
+        print("X")
+        tracking[pmid] = {"status": "failed", "doi": doi, "pmcid": pmcid}
+        return False
+
     # 1. PubMed Central (known PMCID) -----------------------------------------
     if pmcid:
         print("    [1] PMC ...          ", end="", flush=True)
@@ -2018,19 +2037,6 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
         print("X")
 
     if pmc_only:
-        return False
-
-    if ebsco_only:
-        # Jump straight to EBSCO; skip everything else
-        print("    [3] EBSCO ...        ", end="", flush=True)
-        time.sleep(GENERAL_DELAY)
-        src = try_ebsco(pmid_numeric, doi, path, verbose=verbose)
-        if src:
-            print("OK")
-            tracking[pmid] = {"status": "downloaded", "filename": filename,
-                               "source": "ebsco", "doi": doi, "pmcid": pmcid}
-            return True
-        print("X")
         tracking[pmid] = {"status": "failed", "doi": doi, "pmcid": pmcid}
         return False
 
@@ -2156,6 +2162,10 @@ def main():
                         help="Only try PMC (skip LibKey, Unpaywall, direct DOI).")
     parser.add_argument("--ebsco-only", action="store_true",
                         help="Only try EBSCO (skip PMC, PubMed page, LibKey, etc.).")
+    parser.add_argument("--pmid", metavar="PMID",
+                        help="Process only this PMID (overrides --count/--all/--skip).")
+    parser.add_argument("--doi", metavar="DOI",
+                        help="Process only the paper with this DOI (overrides --count/--all/--skip).")
     parser.add_argument("--debug", action="store_true",
                         help="Enable verbose debug output for each strategy.")
     parser.add_argument(
@@ -2185,21 +2195,43 @@ def main():
     elif args.skip == "auth":
         skip_statuses = {"downloaded", "no_subscription"}
 
-    papers = [
-        (pmid, info) for pmid, info in data.items()
-        if tracking.get(pmid, {}).get("status") not in skip_statuses
-    ]
+    # --pmid / --doi: target a single paper regardless of skip/count settings
+    if args.pmid or args.doi:
+        needle_pmid = (args.pmid or "").strip()
+        needle_doi  = (args.doi  or "").strip().lower()
+        batch = []
+        for pmid, info in data.items():
+            numeric_id = re.sub(r'^https?://identifiers\.org/pubmed/', '', pmid)
+            numeric_id = re.sub(r'^https?://identifiers\.org/doi/', '', numeric_id)
+            if needle_pmid and needle_pmid == numeric_id:
+                batch = [(pmid, info)]; break
+            if needle_doi:
+                info_doi = (info.get("doi") or "").lower()
+                if needle_doi == info_doi or needle_doi == numeric_id.lower():
+                    batch = [(pmid, info)]; break
+        if not batch:
+            print(f"No paper found matching "
+                  f"{'PMID ' + args.pmid if args.pmid else 'DOI ' + args.doi}")
+            sys.exit(1)
+    else:
+        papers = [
+            (pmid, info) for pmid, info in data.items()
+            if tracking.get(pmid, {}).get("status") not in skip_statuses
+        ]
+        start = args.start
+        count = len(papers) if args.all else args.count
+        # When pmc_only, don't pre-slice — the loop counts only attempted papers
+        if args.pmc_only:
+            batch = papers[start:]
+        else:
+            batch = papers[start: start + count]
 
-    start = args.start
-    count = len(papers) if args.all else args.count
-    batch = papers[start: start + count]
-
-    print(f"Papers to process : {len(batch)}")
     print(f"Output directory  : {OUTPUT_DIR}")
     print(f"Tracking file     : {TRACKING_FILE}")
 
     ok = 0
     failed = 0
+    attempted = 0
     for pmid, info in batch:
         title     = info.get("title", "")
         accession = info.get("accession") or ""
@@ -2222,13 +2254,19 @@ def main():
             ebsco_only=args.ebsco_only,
         )
         if success:
+            attempted += 1
             ok += 1
             save_tracking(tracking, pmid)
         elif pmid in tracking and tracking[pmid] != tracking_before.get(pmid):
+            attempted += 1
             failed += 1
             save_tracking(tracking, pmid)
+        # else: silently skipped (no PMCID with --pmc-only); don't count
 
-    print(f"\nDone. {ok}/{len(batch)} downloaded.")
+        if not args.all and attempted >= count:
+            break
+
+    print(f"\nDone. {ok}/{attempted} downloaded.")
     already = sum(1 for v in tracking.values() if v.get("status") == "downloaded")
     print(f"Total downloaded so far: {already}")
 

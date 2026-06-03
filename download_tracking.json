@@ -6771,7 +6771,7 @@
   },
   "http://identifiers.org/pubmed/22051568": {
     "status": "failed",
-    "doi": "10.1016/j.jtbi.2011.10.027",
+    "doi": null,
     "pmcid": null
   },
   "http://identifiers.org/pubmed/9785481": {
@@ -7788,7 +7788,7 @@
   "http://identifiers.org/pubmed/17189866": {
     "status": "failed",
     "doi": "10.1016/j.ymeth.2006.08.003",
-    "pmcid": "PMC1993813"
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/26928575": {
     "status": "downloaded",
@@ -7832,7 +7832,7 @@
   "http://identifiers.org/pubmed/23098257": {
     "status": "failed",
     "doi": "10.1080/17513758.2012.733427",
-    "pmcid": "PMC4260360"
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/25839182": {
     "status": "downloaded",
@@ -7844,7 +7844,7 @@
   "http://identifiers.org/pubmed/30713074": {
     "status": "failed",
     "doi": "10.1016/j.devcel.2018.12.024",
-    "pmcid": "PMC6414255"
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/29856829": {
     "status": "downloaded",
@@ -8535,7 +8535,9 @@
     "pmcid": null
   },
   "http://identifiers.org/doi/10.1038/s44320-023-00007-4": {
-    "status": "failed",
+    "status": "downloaded",
+    "filename": "PMID10.1038_s44320-023-00007-4_Basal_MET_phosphorylation_is_an_indicator_of_hepatocyte_dysregulation.pdf",
+    "source": "ebsco",
     "doi": "10.1038/s44320-023-00007-4",
     "pmcid": null
   },
