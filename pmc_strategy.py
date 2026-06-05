@@ -129,6 +129,9 @@ def try_pmc(pmcid, path, verbose=False):
             params={"id": pmc_full}, timeout=30,
         )
         vlog(f"OA API status={r.status_code} body={r.text[:400]}")
+        if r.status_code == 200 and 'idIsNotOpenAccess' in r.text:
+            vlog("OA API: not Open Access — skipping all remaining PMC strategies")
+            return None
         if r.status_code == 200:
             links = re.findall(r'href="([^"]+)"', r.text)
             pdf_links = [l for l in links if l.endswith(".pdf")]

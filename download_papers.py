@@ -97,8 +97,52 @@ def save_tracking(tracking, pmid):
         _release_lock()
         print(" done.")
 
+
+def _should_update_resolved(old_status, new_status):
+    """
+    Return True only when something genuinely new happened:
+      - Paper never attempted before (old_status is None)
+      - Previously failed in some way, now succeeded
+    Never update if the paper was already downloaded (don't downgrade),
+    or if it was failing before and is still failing.
+    """
+    if old_status is None:
+        return True                            # first attempt
+    if old_status == "downloaded":
+        return False                           # never overwrite a success
+    return new_status == "downloaded"          # upgrade: failure → success
+
+
+def save_resolved(data, pmid, tracking_entry):
+    """
+    Write the download result back into the resolved JSON file.
+    Only the 'download' sub-key is touched; all other fields are preserved.
+    Uses an atomic write so a crash mid-write doesn't corrupt the file.
+    """
+    import tempfile, os
+    download_info = {k: v for k, v in tracking_entry.items()
+                     if k in ("status", "filename", "source", "manual_url")}
+    try:
+        on_disk = json.loads(RESOLVED_FILE.read_text(encoding="utf-8"))
+        if pmid in on_disk:
+            on_disk[pmid]["download"] = download_info
+        tmp_fd, tmp_path = tempfile.mkstemp(dir=SCRIPT_DIR, suffix=".tmp")
+        try:
+            with os.fdopen(tmp_fd, "w", encoding="utf-8") as f:
+                f.write(json.dumps(on_disk, indent=2, ensure_ascii=False))
+            os.replace(tmp_path, RESOLVED_FILE)
+        except Exception:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
+    except Exception as e:
+        print(f"    [resolved] write error: {e}")
+
 # ── Download orchestration ────────────────────────────────────────────────────
-def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=False, ebsco_only=False):
+def download_paper(pmid, title, pmc_info, tracking, tracking_key,
+                   verbose=False, pmc_only=False, ebsco_only=False):
     pmcid        = pmc_info.get("pmcid")
     doi          = pmc_info.get("doi")
     pmid_numeric = pmc_info.get("pmid_numeric") or pmid
@@ -117,11 +161,11 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
         src = try_ebsco(pmid_numeric, doi, path, verbose=verbose)
         if src:
             print("OK")
-            tracking[pmid] = {"status": "downloaded", "filename": filename,
+            tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                                "source": "ebsco", "doi": doi, "pmcid": pmcid}
             return True
         print("X")
-        tracking[pmid] = {"status": "failed", "doi": doi, "pmcid": pmcid}
+        tracking[tracking_key] = {"status": "failed", "doi": doi, "pmcid": pmcid}
         return False
 
     # 1. PubMed Central (known PMCID) -----------------------------------------
@@ -130,13 +174,13 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
         src = try_pmc(pmcid, path, verbose=verbose)
         if src:
             print("OK")
-            tracking[pmid] = {"status": "downloaded", "filename": filename,
+            tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                                "source": "pmc", "pmcid": pmcid, "doi": doi}
             return True
         print("X")
 
     if pmc_only:
-        tracking[pmid] = {"status": "failed", "doi": doi, "pmcid": pmcid}
+        tracking[tracking_key] = {"status": "failed", "doi": doi, "pmcid": pmcid}
         return False
 
     # 2. PubMed page (may reveal PMC ID or free links) ------------------------
@@ -145,7 +189,7 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
     src, found_pmcid = try_pubmed_page(pmid_numeric, path)
     if src:
         print("OK")
-        tracking[pmid] = {"status": "downloaded", "filename": filename,
+        tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                            "source": "pubmed_page", "pmcid": found_pmcid, "doi": doi}
         return True
     if found_pmcid and found_pmcid != pmcid:
@@ -154,7 +198,7 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
         src = try_pmc(found_pmcid, path, verbose=verbose)
         if src:
             print("OK")
-            tracking[pmid] = {"status": "downloaded", "filename": filename,
+            tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                                "source": "pmc", "pmcid": found_pmcid, "doi": doi}
             return True
         print("X")
@@ -167,7 +211,7 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
     src = try_ebsco(pmid_numeric, doi, path, verbose=verbose)
     if src:
         print("OK")
-        tracking[pmid] = {"status": "downloaded", "filename": filename,
+        tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                            "source": "ebsco", "doi": doi, "pmcid": pmcid}
         return True
     else:
@@ -179,11 +223,11 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
     src = try_libkey(pmid_numeric, doi, path, verbose=verbose)
     if src is _NO_SUBSCRIPTION:
         print("no UW subscription")
-        tracking[pmid] = {"status": "no_subscription", "doi": doi, "pmcid": pmcid}
+        tracking[tracking_key] = {"status": "no_subscription", "doi": doi, "pmcid": pmcid}
         # Fall through to open-access steps
     elif src:
         print("OK")
-        tracking[pmid] = {"status": "downloaded", "filename": filename,
+        tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                            "source": "libkey", "doi": doi, "pmcid": pmcid}
         return True
     else:
@@ -196,7 +240,7 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
         src = try_unpaywall(doi, path)
         if src:
             print("OK")
-            tracking[pmid] = {"status": "downloaded", "filename": filename,
+            tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                                "source": "unpaywall", "doi": doi}
             return True
         print("X")
@@ -208,7 +252,7 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
         src = try_semantic_scholar(doi, title, path, verbose=verbose)
         if src:
             print(" OK")
-            tracking[pmid] = {"status": "downloaded", "filename": filename,
+            tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                                "source": "semantic_scholar", "doi": doi}
             return True
         print(" X")
@@ -220,7 +264,7 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
         src = try_scholarly(doi, title, path)
         if src:
             print(" OK")
-            tracking[pmid] = {"status": "downloaded", "filename": filename,
+            tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                                "source": "google_scholar", "doi": doi}
             return True
         print(" X")
@@ -232,18 +276,18 @@ def download_paper(pmid, title, pmc_info, tracking, verbose=False, pmc_only=Fals
         src, manual_url = try_direct_doi(doi, path, verbose=verbose)
         if src:
             print("OK")
-            tracking[pmid] = {"status": "downloaded", "filename": filename,
+            tracking[tracking_key] = {"status": "downloaded", "filename": filename,
                                "source": "direct_doi", "doi": doi}
             return True
         print("X")
         if manual_url:
             print(f"    -> needs manual: {manual_url}")
-            tracking[pmid] = {"status": "needs_manual", "filename": filename,
+            tracking[tracking_key] = {"status": "needs_manual", "filename": filename,
                                "manual_url": manual_url, "doi": doi, "pmcid": pmcid}
             return False
 
     print("    All strategies failed.")
-    tracking[pmid] = {"status": "failed", "doi": doi, "pmcid": pmcid}
+    tracking[tracking_key] = {"status": "failed", "doi": doi, "pmcid": pmcid}
     return False
 
 
@@ -288,6 +332,8 @@ def main():
         print("Run  python resolve_ids.py  first to resolve PMIDs/PMCIDs/DOIs.")
         sys.exit(1)
     data = json.loads(RESOLVED_FILE.read_text(encoding="utf-8"))
+    print(f"Papers in resolved JSON : {len(data)}")
+    print(f"Entries in tracking     : {len(tracking)}")
 
     skip_statuses = set()
     if args.skip == "tried":
@@ -321,6 +367,7 @@ def main():
             (pmid, info) for pmid, info in data.items()
             if tracking.get(pmid, {}).get("status") not in skip_statuses
         ]
+        print(f"Papers after skip filter: {len(papers)}")
         start = args.start
         count = len(papers) if args.all else args.count
         if args.pmc_only:
@@ -335,8 +382,7 @@ def main():
     failed = 0
     attempted = 0
     for pmid, info in batch:
-        title     = info.get("title", "")
-        accession = info.get("accession") or ""
+        title      = info.get("title", "")
         numeric_id = re.sub(r'^https?://identifiers\.org/pubmed/', '', pmid)
         numeric_id = re.sub(r'^https?://identifiers\.org/doi/', '', numeric_id)
 
@@ -346,34 +392,45 @@ def main():
             "doi":          info.get("doi"),
         }
 
+        tracking_key = pmid
+        old_status = tracking.get(tracking_key, {}).get("status")
+
         result = download_paper(
             pmid, title, pmc_info, tracking,
+            tracking_key=tracking_key,
             verbose=args.debug,
             pmc_only=args.pmc_only,
             ebsco_only=args.ebsco_only,
         )
         if result is None:
-            # No PMCID with --pmc-only: record so we skip on future runs
-            if args.pmc_only:
-                tracking[pmid] = {"status": "no_pmcid", "doi": pmc_info.get("doi")}
-                save_tracking(tracking, pmid)
+            pass  # no PMCID — derivable from resolved JSON, not worth persisting
         elif result:
             attempted += 1
             ok += 1
-            save_tracking(tracking, pmid)
+            if _should_update_resolved(old_status, "downloaded"):
+                save_tracking(tracking, tracking_key)
+                save_resolved(data, pmid, tracking[tracking_key])
         else:
             attempted += 1
             failed += 1
-            save_tracking(tracking, pmid)
+            new_status = tracking.get(tracking_key, {}).get("status")
+            if _should_update_resolved(old_status, new_status):
+                save_tracking(tracking, tracking_key)
+                save_resolved(data, pmid, tracking[tracking_key])
 
         if not args.all and attempted >= count:
             break
 
     print(f"\nDone. {ok}/{attempted} downloaded.")
-    already = sum(1 for v in tracking.values() if v.get("status") == "downloaded")
-    print(f"Total downloaded so far: {already}")
+    tracked_downloaded = sum(1 for v in tracking.values() if v.get("status") == "downloaded")
+    on_disk = sum(
+        1 for v in tracking.values()
+        if v.get("status") == "downloaded" and
+        v.get("filename") and (OUTPUT_DIR / v["filename"]).exists()
+    )
+    print(f"Tracked as downloaded: {tracked_downloaded}  |  PDF on disk: {on_disk}")
 
 
 if __name__ == "__main__":
     main()
-                                          
+
