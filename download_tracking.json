@@ -145,98 +145,146 @@
   "http://identifiers.org/pubmed/12405768": {
     "status": "needs_manual",
     "filename": "PMID12405768_Kinetic_modeling_of_reactions_in_heated_monosaccharide-casein_systems_.pdf",
-    "manual_url": "https://pubs.acs.org/doi/10.1021/jf011164h",
+    "manual_urls": [
+      "https://pubs.acs.org/doi/10.1021/jf011164h",
+      "https://resolve.thirdiron.com/v2/articles/3574418/content"
+    ],
     "doi": "10.1021/jf011164h",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/8733433": {
     "status": "needs_manual",
     "filename": "PMID8733433_A_possible_role_of_adenylate_metabolism_in_human_erythrocytes__simple.pdf",
-    "manual_url": "https://linkinghub.elsevier.com/retrieve/pii/S0022519396900508",
+    "manual_urls": [
+      "https://linkinghub.elsevier.com/retrieve/pii/S0022519396900508",
+      "https://resolve.thirdiron.com/v2/articles/308407699/content"
+    ],
     "doi": "10.1006/jtbi.1996.0050",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/12779457": {
     "status": "needs_manual",
     "filename": "PMID12779457_A_bifurcation_analysis_of_two_coupled_calcium_oscillators_.pdf",
-    "manual_url": "https://pubs.aip.org/cha/article/11/1/237/134660/A-bifurcation-analysis-of-two-coupled-calcium",
+    "manual_urls": [
+      "https://pubs.aip.org/cha/article/11/1/237/134660/A-bifurcation-analysis-of-two-coupled-calcium",
+      "https://resolve.thirdiron.com/v2/articles/45171266/content",
+      "http://deepblue.lib.umich.edu/bitstream/2027.42/70869/2/CHAOEH-11-1-237-1.pdf"
+    ],
     "doi": "10.1063/1.1342161",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/12644446": {
     "status": "needs_manual",
     "filename": "PMID12644446_Modeling_of_Ca2__flux_in_pancreatic_beta-cells__role_of_the_plasma_mem.pdf",
-    "manual_url": "https://journals.physiology.org/doi/10.1152/ajpendo.00194.2002",
+    "manual_urls": [
+      "https://journals.physiology.org/doi/10.1152/ajpendo.00194.2002",
+      "https://resolve.thirdiron.com/v2/articles/54138878/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/54138878/content"
+    ],
     "doi": "10.1152/ajpendo.00194.2002",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/11744196": {
     "status": "needs_manual",
     "filename": "PMID11744196_Full-scale_model_of_glycolysis_in_Saccharomyces_cerevisiae_.pdf",
-    "manual_url": "https://linkinghub.elsevier.com/retrieve/pii/S0301462201002290",
+    "manual_urls": [
+      "https://linkinghub.elsevier.com/retrieve/pii/S0301462201002290",
+      "https://resolve.thirdiron.com/v2/articles/12462749/content"
+    ],
     "doi": "10.1016/s0301-4622(01)00229-0",
     "pmcid": null
   },
   "http://identifiers.org/doi/10.1016/0141-0229(90)90033-M": {
     "status": "needs_manual",
-    "filename": "PMID10.1016/0141-0229(90)90033-M_Fermentation_pathway_kinetics_and_metabolic_flux_control_in_suspended.pdf",
-    "manual_url": "https://linkinghub.elsevier.com/retrieve/pii/014102299090033M",
+    "filename": "PMIDhttp___identifiers.org_doi_10.1016_0141-0229_90_90033-M_Fermentation_pathway_kinetics_and_metabolic_flux_control_in_suspended.pdf",
+    "manual_urls": [
+      "https://linkinghub.elsevier.com/retrieve/pii/014102299090033M"
+    ],
     "doi": "10.1016/0141-0229(90)90033-M",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/16873466": {
     "status": "needs_manual",
     "filename": "PMID16873466_Bistable_switching_and_excitable_behaviour_in_the_activation_of_Src_at.pdf",
-    "manual_url": "https://academic.oup.com/bioinformatics/article/22/14/e158/227771",
+    "manual_urls": [
+      "https://academic.oup.com/bioinformatics/article/22/14/e158/227771",
+      "https://resolve.thirdiron.com/v2/articles/26912398/content",
+      "https://academic.oup.com/bioinformatics/article-pdf/22/14/e158/48841330/bioinformatics_22_14_e158.pdf"
+    ],
     "doi": "10.1093/bioinformatics/btl201",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/10662710": {
     "status": "needs_manual",
     "filename": "PMID10662710_A_mathematical_model_quantifying_GnRH-induced_LH_secretion_from_gonado.pdf",
-    "manual_url": "https://journals.physiology.org/doi/10.1152/ajpendo.2000.278.2.E263",
+    "manual_urls": [
+      "https://journals.physiology.org/doi/10.1152/ajpendo.2000.278.2.E263",
+      "https://resolve.thirdiron.com/v2/articles/169481549/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/169481549/content",
+      "https://doi.org/10.1152/ajpendo.2000.278.2.e263"
+    ],
     "doi": "10.1152/ajpendo.2000.278.2.E263",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/2574993": {
     "status": "needs_manual",
     "filename": "PMID2574993_Rapid_kinetics_of_alpha_2-adrenergic_inhibition_of_adenylate_cyclase_.pdf",
-    "manual_url": "https://pubs.acs.org/doi/abs/10.1021/bi00448a015",
+    "manual_urls": [
+      "https://pubs.acs.org/doi/abs/10.1021/bi00448a015",
+      "https://resolve.thirdiron.com/v2/articles/3341150/content"
+    ],
     "doi": "10.1021/bi00448a015",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/11423122": {
     "status": "needs_manual",
     "filename": "PMID11423122_Mathematical_analysis_of_a_mechanism_for_autonomous_metabolic_oscillat.pdf",
-    "manual_url": "https://febs.onlinelibrary.wiley.com/doi/10.1016/S0014-5793%2801%2902562-5",
+    "manual_urls": [
+      "https://febs.onlinelibrary.wiley.com/doi/10.1016/S0014-5793%2801%2902562-5",
+      "https://resolve.thirdiron.com/v2/articles/17872626/content",
+      "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1016/S0014-5793%2801%2902562-5"
+    ],
     "doi": "10.1016/s0014-5793(01)02562-5",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/15610770": {
     "status": "needs_manual",
     "filename": "PMID15610770_Modelling_the_actions_of_chaperones_and_their_role_in_ageing_.pdf",
-    "manual_url": "https://linkinghub.elsevier.com/retrieve/pii/S0047637404002337",
+    "manual_urls": [
+      "https://linkinghub.elsevier.com/retrieve/pii/S0047637404002337",
+      "https://resolve.thirdiron.com/v2/articles/17473279/content"
+    ],
     "doi": "10.1016/j.mad.2004.09.031",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/12527385": {
     "status": "needs_manual",
     "filename": "PMID12527385_Control_mechanism_of_JAK_STAT_signal_transduction_pathway_.pdf",
-    "manual_url": "https://febs.onlinelibrary.wiley.com/doi/10.1016/S0014-5793%2802%2903842-5",
+    "manual_urls": [
+      "https://febs.onlinelibrary.wiley.com/doi/10.1016/S0014-5793%2802%2903842-5",
+      "https://resolve.thirdiron.com/v2/articles/17880759/content",
+      "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1016/S0014-5793%2802%2903842-5"
+    ],
     "doi": "10.1016/s0014-5793(02)03842-5",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/14556891": {
     "status": "needs_manual",
     "filename": "PMID14556891_A_theoretical_study_of_effects_of_cytosolic_Ca2__oscillations_on_activ.pdf",
-    "manual_url": "https://linkinghub.elsevier.com/retrieve/pii/S0301462203001923",
+    "manual_urls": [
+      "https://linkinghub.elsevier.com/retrieve/pii/S0301462203001923",
+      "https://resolve.thirdiron.com/v2/articles/12464214/content"
+    ],
     "doi": "10.1016/s0301-4622(03)00192-3",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/8126097": {
     "status": "needs_manual",
     "filename": "PMID8126097_Numerical_analysis_of_a_comprehensive_model_of_M-phase_control_in_Xeno.pdf",
-    "manual_url": "https://journals.biologists.com/jcs/article/106/4/1153/23833/Numerical-analysis-of-a-comprehensive-model-of-M",
+    "manual_urls": [
+      "https://journals.biologists.com/jcs/article/106/4/1153/23833/Numerical-analysis-of-a-comprehensive-model-of-M",
+      "https://resolve.thirdiron.com/v2/articles/467494469/content"
+    ],
     "doi": "10.1242/jcs.106.4.1153",
     "pmcid": null
   },
@@ -2293,36 +2341,79 @@
     "pmcid": null
   },
   "http://identifiers.org/pubmed/2904647": {
-    "status": "no_pmcid",
-    "doi": null
+    "status": "failed",
+    "doi": null,
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/1316185": {
-    "status": "no_pmcid",
-    "doi": "10.1016/0301-4622(92)80018-z"
+    "status": "needs_manual",
+    "filename": "PMID1316185_Protein_phosphorylation_driven_by_intracellular_calcium_oscillations_.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/12461342/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/030146229280018Z"
+    ],
+    "doi": "10.1016/0301-4622(92)80018-z",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/1904060": {
-    "status": "no_pmcid",
-    "doi": null
+    "status": "needs_manual",
+    "filename": "PMID1904060_Hormone-induced_calcium_oscillations_in_liver_cells_can_be_explained_b.pdf",
+    "manual_urls": [
+      "https://linkinghub.elsevier.com/retrieve/pii/S0021925818991295"
+    ],
+    "doi": null,
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/1647878": {
-    "status": "no_pmcid",
-    "doi": "10.1016/0143-4160(91)90010-c"
+    "status": "needs_manual",
+    "filename": "PMID1647878_Signal-induced_Ca2__oscillations__properties_of_a_model_based_on_Ca_2_.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/16051381/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/014341609190010C"
+    ],
+    "doi": "10.1016/0143-4160(91)90010-c",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/16807352": {
-    "status": "no_pmcid",
-    "doi": "10.1152/jn.00205.2006"
+    "status": "needs_manual",
+    "filename": "PMID16807352_Contribution_of_persistent_Na__current_and_M-type_K__current_to_somati.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/37102174/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/37102174/content",
+      "https://journals.physiology.org/doi/10.1152/jn.00205.2006"
+    ],
+    "doi": "10.1152/jn.00205.2006",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/11334834": {
-    "status": "no_pmcid",
-    "doi": "10.1016/s0008-6363(00)00293-5"
+    "status": "needs_manual",
+    "filename": "PMID11334834_Cellular_consequences_of_HERG_mutations_in_the_long_QT_syndrome__precu.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/43728832/content",
+      "https://academic.oup.com/cardiovascres/article-pdf/50/2/301/767068/50-2-301.pdf",
+      "https://academic.oup.com/cardiovascres/article-lookup/doi/10.1016/S0008-6363(00)00293-5"
+    ],
+    "doi": "10.1016/s0008-6363(00)00293-5",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/16375866": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.bcp.2005.11.016"
+    "status": "needs_manual",
+    "filename": "PMID16375866_Diethyl_pyrocarbonate__a_histidine-modifying_agent__directly_stimulate.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/16397489/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S000629520500780X"
+    ],
+    "doi": "10.1016/j.bcp.2005.11.016",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/18244602": {
-    "status": "no_pmcid",
-    "doi": "10.1109/TNN.2003.820440"
+    "status": "needs_manual",
+    "filename": "PMID18244602_Simple_model_of_spiking_neurons_.pdf",
+    "manual_urls": [
+      "https://ieeexplore.ieee.org/document/1257420/"
+    ],
+    "doi": "10.1109/TNN.2003.820440",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/16434725": {
     "status": "downloaded",
@@ -2331,48 +2422,117 @@
     "doi": "10.1126/stke.3192006pe4"
   },
   "http://identifiers.org/pubmed/15484883": {
-    "status": "no_pmcid",
-    "doi": "10.1109/TNN.2004.832719"
+    "status": "needs_manual",
+    "filename": "PMID15484883_Which_model_to_use_for_cortical_spiking_neurons_.pdf",
+    "manual_urls": [
+      "https://ieeexplore.ieee.org/document/1333071/"
+    ],
+    "doi": "10.1109/TNN.2004.832719",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/12376338": {
-    "status": "no_pmcid",
-    "doi": "10.1152/ajpendo.00571.2001"
+    "status": "needs_manual",
+    "filename": "PMID12376338_A_mathematical_model_of_metabolic_insulin_signaling_pathways_.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/54138732/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/54138732/content",
+      "https://journals.physiology.org/doi/10.1152/ajpendo.00571.2001"
+    ],
+    "doi": "10.1152/ajpendo.00571.2001",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/12424381": {
-    "status": "no_pmcid",
-    "doi": "10.1126/science.1071914"
+    "status": "needs_manual",
+    "filename": "PMID12424381_The_IkappaB-NF-kappaB_signaling_module__temporal_control_and_selective.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/13425613/content",
+      "https://www.science.org/doi/10.1126/science.1071914"
+    ],
+    "doi": "10.1126/science.1071914",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17188305": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.jtbi.2006.11.007"
+    "status": "needs_manual",
+    "filename": "PMID17188305_A_quantitative_kinetic_model_for_ATP-induced_intracellular_Ca2__oscill.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5917177/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0022519306005492"
+    ],
+    "doi": "10.1016/j.jtbi.2006.11.007",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/14499354": {
-    "status": "no_pmcid",
-    "doi": "10.1016/s8756-3282(03)00157-1"
+    "status": "needs_manual",
+    "filename": "PMID14499354_Mathematical_model_predicts_a_critical_role_for_osteoclast_autocrine_r.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/8276806/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S8756328203001571"
+    ],
+    "doi": "10.1016/s8756-3282(03)00157-1",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/11959850": {
-    "status": "no_pmcid",
-    "doi": "10.1074/jbc.M107890200"
+    "status": "needs_manual",
+    "filename": "PMID11959850_Kinetic_mechanism_of_activation_of_the_Cdk2_cyclin_A_complex__Key_role.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/35852641/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/35852641/content",
+      "http://www.jbc.org/article/S0021925819667712/pdf",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0021925819667712"
+    ],
+    "doi": "10.1074/jbc.M107890200",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/16752369": {
-    "status": "no_pmcid",
-    "doi": "10.1002/bit.21026"
+    "status": "needs_manual",
+    "filename": "PMID16752369_Modeling_regulatory_mechanisms_in_IL-6_signal_transduction_in_hepatocy.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/25214015/content",
+      "https://analyticalsciencejournals.onlinelibrary.wiley.com/doi/10.1002/bit.21026"
+    ],
+    "doi": "10.1002/bit.21026",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17157878": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.jtbi.2006.10.028"
+    "status": "needs_manual",
+    "filename": "PMID17157878_Modelling_of_circadian_rhythms_in_Drosophila_incorporating_the_interlo.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5917188/content",
+      "https://researcharchive.lincoln.ac.nz/bitstreams/131af16a-dcc0-47cf-a5d7-d17e0f79c00b/download",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0022519306005182"
+    ],
+    "doi": "10.1016/j.jtbi.2006.10.028",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/11799242": {
-    "status": "no_pmcid",
-    "doi": "10.1126/science.1064732"
+    "status": "needs_manual",
+    "filename": "PMID11799242_Systems_analysis_of_Ran_transport_.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/13416151/content",
+      "https://www.science.org/doi/10.1126/science.1064732"
+    ],
+    "doi": "10.1126/science.1064732",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17560007": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.bpc.2007.05.006"
+    "status": "needs_manual",
+    "filename": "PMID17560007_A_theoretical_study_on_activation_of_transcription_factor_modulated_by.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/12465055/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0301462207001160"
+    ],
+    "doi": "10.1016/j.bpc.2007.05.006",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17091582": {
-    "status": "no_pmcid",
-    "doi": "10.1049/sb:20045037"
+    "status": "needs_manual",
+    "filename": "PMID17091582_STAT_module_can_function_as_a_biphasic_amplitude_filter_.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/54897207/content",
+      "https://digital-library.theiet.org/content/journals/10.1049/sb_20045037"
+    ],
+    "doi": "10.1049/sb:20045037",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17886749": {
     "status": "downloaded",
@@ -2381,24 +2541,56 @@
     "doi": "10.1006/bulm.1999.0118"
   },
   "http://identifiers.org/pubmed/9486845": {
-    "status": "no_pmcid",
-    "doi": "10.1177/074873098128999934"
+    "status": "needs_manual",
+    "filename": "PMID9486845_A_model_for_circadian_rhythms_in_Drosophila_incorporating_the_formatio.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5072047/content",
+      "https://journals.sagepub.com/doi/10.1177/074873098128999934"
+    ],
+    "doi": "10.1177/074873098128999934",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17892872": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.febslet.2007.09.020"
+    "status": "needs_manual",
+    "filename": "PMID17892872_Interlinked_mutual_inhibitory_positive_feedbacks_induce_robust_cellula.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/17887020/content",
+      "https://febs.onlinelibrary.wiley.com/doi/10.1016/j.febslet.2007.09.020"
+    ],
+    "doi": "10.1016/j.febslet.2007.09.020",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/18203579": {
-    "status": "no_pmcid",
-    "doi": "10.1049/iet-syb:20070018"
+    "status": "needs_manual",
+    "filename": "PMID18203579_A_minimal_mathematical_model_combining_several_regulatory_cycles_from.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/54918026/content",
+      "https://digital-library.theiet.org/doi/10.1049/iet-syb%3A20070018"
+    ],
+    "doi": "10.1049/iet-syb:20070018",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/18275973": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.jtbi.2007.12.011"
+    "status": "needs_manual",
+    "filename": "PMID18275973_A_mathematical_model_of_spontaneous_calcium_II__oscillations_in_astroc.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5917747/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0022519307006510"
+    ],
+    "doi": "10.1016/j.jtbi.2007.12.011",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/16709566": {
-    "status": "no_pmcid",
-    "doi": "10.1074/jbc.M602756200"
+    "status": "needs_manual",
+    "filename": "PMID16709566_Mathematical_modeling_of_polyamine_metabolism_in_mammals_.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/35876606/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/35876606/content",
+      "https://riuma.uma.es/xmlui/bitstream/10630/32289/1/JBC.pdf",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0021925819476990"
+    ],
+    "doi": "10.1074/jbc.M602756200",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17520329": {
     "status": "downloaded",
@@ -2407,12 +2599,25 @@
     "doi": "10.1007/s00726-007-0502-7"
   },
   "http://identifiers.org/pubmed/18675311": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.biosystems.2008.06.007"
+    "status": "needs_manual",
+    "filename": "PMID18675311_In_silico_study_of_kinetochore_control__amplification__and_inhibition.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/7139860/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0303264708001457"
+    ],
+    "doi": "10.1016/j.biosystems.2008.06.007",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/18295960": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.bpc.2008.01.007"
+    "status": "needs_manual",
+    "filename": "PMID18295960_Mad2_binding_is_not_sufficient_for_complete_Cdc20_sequestering_in_mito.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/12465163/content",
+      "https://hal.archives-ouvertes.fr/hal-00501697/file/PEER_stage2_10.1016%252Fj.bpc.2008.01.007.pdf",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0301462208000197"
+    ],
+    "doi": "10.1016/j.bpc.2008.01.007",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/11371178": {
     "status": "downloaded",
@@ -2421,8 +2626,14 @@
     "doi": "10.1006/jtbi.2001.2293"
   },
   "http://identifiers.org/pubmed/16473373": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.jtbi.2005.12.020"
+    "status": "needs_manual",
+    "filename": "PMID16473373_A_simple_time_delay_model_for_eukaryotic_cell_cycle_.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5914161/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S002251930500559X"
+    ],
+    "doi": "10.1016/j.jtbi.2005.12.020",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17548463": {
     "status": "downloaded",
@@ -2431,64 +2642,160 @@
     "doi": "10.1124/dmd.107.015636"
   },
   "http://identifiers.org/pubmed/8573563": {
-    "status": "no_pmcid",
-    "doi": "10.1021/bi9519718"
+    "status": "needs_manual",
+    "filename": "PMID8573563_Spectral_and_kinetic_studies_on_the_activation_of_soluble_guanylate_cy.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/3296512/content",
+      "https://pubs.acs.org/doi/10.1021/bi9519718"
+    ],
+    "doi": "10.1021/bi9519718",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/11038356": {
-    "status": "no_pmcid",
-    "doi": "10.1074/jbc.M006858200"
+    "status": "needs_manual",
+    "filename": "PMID11038356_A_kinetic_simulation_model_that_describes_catalysis_and_regulation_in.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/35838121/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/35838121/content",
+      "http://www.jbc.org/article/S0021925818441403/pdf",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0021925818441403"
+    ],
+    "doi": "10.1074/jbc.M006858200",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/18308339": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.jtbi.2008.01.006"
+    "status": "needs_manual",
+    "filename": "PMID18308339_Modeling_the_segmentation_clock_as_a_network_of_coupled_oscillations_i.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5917691/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0022519308000179"
+    ],
+    "doi": "10.1016/j.jtbi.2008.01.006",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/18538916": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.bpc.2008.04.010"
+    "status": "needs_manual",
+    "filename": "PMID18538916_Dynamic_simulation_of_the_effect_of_calcium-release_activated_calcium.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/12465210/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0301462208000884"
+    ],
+    "doi": "10.1016/j.bpc.2008.04.010",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/18505685": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.febslet.2008.05.026"
+    "status": "needs_manual",
+    "filename": "PMID18505685_Simulation_of_the_regulation_of_EGFR_endocytosis_and_EGFR-ERK_signalin.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/17887599/content",
+      "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1016/j.febslet.2008.05.026",
+      "https://febs.onlinelibrary.wiley.com/doi/10.1016/j.febslet.2008.05.026"
+    ],
+    "doi": "10.1016/j.febslet.2008.05.026",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/10415827": {
-    "status": "no_pmcid",
-    "doi": "10.1111/j.1749-6632.1999.tb10419.x"
+    "status": "needs_manual",
+    "filename": "PMID10415827_Alternating_oscillations_and_chaos_in_a_model_of_two_coupled_biochemic.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/30266489/content",
+      "https://nyaspubs.onlinelibrary.wiley.com/doi/10.1111/j.1749-6632.1999.tb10419.x"
+    ],
+    "doi": "10.1111/j.1749-6632.1999.tb10419.x",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/14582399": {
-    "status": "no_pmcid",
-    "doi": null
+    "status": "failed",
+    "doi": null,
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/15955817": {
-    "status": "no_pmcid",
-    "doi": "10.1074/jbc.M502403200"
+    "status": "needs_manual",
+    "filename": "PMID15955817_Experimental_and_in_silico_analyses_of_glycolytic_flux_control_in_bloo.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/35872640/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/35872640/content",
+      "http://www.jbc.org/article/S0021925820565277/pdf",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0021925820565277"
+    ],
+    "doi": "10.1074/jbc.M502403200",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/15496403": {
-    "status": "no_pmcid",
-    "doi": "10.1074/jbc.M410818200"
+    "status": "needs_manual",
+    "filename": "PMID15496403_A_mathematical_model_of_the_folate_cycle__new_insights_into_folate_hom.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/35869107/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/35869107/content",
+      "http://www.jbc.org/article/S0021925818662532/pdf",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0021925818662532"
+    ],
+    "doi": "10.1074/jbc.M410818200",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/19409816": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.immuni.2009.03.013"
+    "status": "needs_manual",
+    "filename": "PMID19409816_Sequential_polarization_and_imprinting_of_type_1_T_helper_lymphocytes.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/7701931/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/7701931/content",
+      "http://www.cell.com/article/S1074761309002015/pdf",
+      "https://linkinghub.elsevier.com/retrieve/pii/S1074761309001848"
+    ],
+    "doi": "10.1016/j.immuni.2009.03.013",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/1867714": {
-    "status": "no_pmcid",
-    "doi": "10.1146/annurev.bb.20.060191.001101"
+    "status": "needs_manual",
+    "filename": "PMID1867714_Calcium_spiking_.pdf",
+    "manual_urls": [
+      "https://www.annualreviews.org/content/journals/10.1146/annurev.bb.20.060191.001101"
+    ],
+    "doi": "10.1146/annurev.bb.20.060191.001101",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/15231543": {
-    "status": "no_pmcid",
-    "doi": "10.1093/bioinformatics/bth110"
+    "status": "needs_manual",
+    "filename": "PMID15231543_Bifurcation_analysis_of_the_regulatory_modules_of_the_mammalian_G1_S_t.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/26910685/content",
+      "https://academic.oup.com/bioinformatics/article-pdf/20/10/1506/650133/bth110.pdf",
+      "https://academic.oup.com/bioinformatics/article/20/10/1506/237097"
+    ],
+    "doi": "10.1093/bioinformatics/bth110",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17052119": {
-    "status": "no_pmcid",
-    "doi": "10.1049/sb:20045009"
+    "status": "needs_manual",
+    "filename": "PMID17052119_Sensitivity_analysis_of_parameters_controlling_oscillatory_signalling.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/54897191/content",
+      "https://digital-library.theiet.org/content/journals/10.1049/sb_20045009"
+    ],
+    "doi": "10.1049/sb:20045009",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/19007794": {
-    "status": "no_pmcid",
-    "doi": "10.1016/j.jtbi.2008.09.037"
+    "status": "needs_manual",
+    "filename": "PMID19007794_Mitochondrial_energetic_metabolism__a_simplified_model_of_TCA_cycle_wi.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5918553/content",
+      "https://hal.archives-ouvertes.fr/hal-00554511/file/PEER_stage2_10.1016%252Fj.jtbi.2008.09.037.pdf",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0022519308004931"
+    ],
+    "doi": "10.1016/j.jtbi.2008.09.037",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/18594002": {
-    "status": "no_pmcid",
-    "doi": "10.1158/1078-0432.CCR-07-4754"
+    "status": "needs_manual",
+    "filename": "PMID18594002_A_pharmacodynamic_model_for_the_time_course_of_tumor_shrinkage_by_gemc.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/37130208/content",
+      "http://clincancerres.aacrjournals.org/content/clincanres/14/13/4213.full.pdf",
+      "https://aacrjournals.org/clincancerres/article/14/13/4213/72920/A-Pharmacodynamic-Model-for-the-Time-Course-of"
+    ],
+    "doi": "10.1158/1078-0432.CCR-07-4754",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/17009101": {
     "status": "downloaded",
@@ -2497,28 +2804,66 @@
     "doi": "10.1007/s11095-006-9143-x"
   },
   "http://identifiers.org/pubmed/8422743": {
-    "status": "no_pmcid",
-    "doi": "10.1038/clpt.1993.3"
+    "status": "needs_manual",
+    "filename": "PMID8422743_Pharmacokinetic-pharmacodynamic_modeling_of_caffeine__tolerance_to_pre.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/49636783/content",
+      "https://onlinelibrary.wiley.com/doi/10.1038/clpt.1993.3"
+    ],
+    "doi": "10.1038/clpt.1993.3",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/12695688": {
-    "status": "no_pmcid",
-    "doi": "10.4161/cc.2.1.186"
+    "status": "needs_manual",
+    "filename": "PMID12695688_Theoretical_and_experimental_evidence_for_hysteresis_in_cell_prolifera.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/54281136/fullTextFile",
+      "https://resolve.thirdiron.com/v2/articles/54281136/content",
+      "https://www.tandfonline.com/doi/pdf/10.4161/cc.2.1.186?needAccess=true",
+      "https://www.tandfonline.com/doi/abs/10.4161/cc.2.1.186"
+    ],
+    "doi": "10.4161/cc.2.1.186",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/11434967": {
-    "status": "no_pmcid",
-    "doi": "10.1016/s0168-1656(01)00269-3"
+    "status": "needs_manual",
+    "filename": "PMID11434967_A_biochemically_structured_model_for_Saccharomyces_cerevisiae_.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/16191960/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0168165601002693"
+    ],
+    "doi": "10.1016/s0168-1656(01)00269-3",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/9612078": {
-    "status": "no_pmcid",
-    "doi": "10.1016/s0968-0004(98)01205-5"
+    "status": "needs_manual",
+    "filename": "PMID9612078_The_danger_of_metabolic_pathways_with_turbo_design_.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/10622167/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0968000498012055"
+    ],
+    "doi": "10.1016/s0968-0004(98)01205-5",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/20664065": {
-    "status": "no_pmcid",
-    "doi": "10.1126/scisignal.2000810"
+    "status": "needs_manual",
+    "filename": "PMID20664065_Decoupling_of_receptor_and_downstream_signals_in_the_Akt_pathway_by_it.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/39633818/content",
+      "https://www.science.org/doi/10.1126/scisignal.2000810"
+    ],
+    "doi": "10.1126/scisignal.2000810",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/12782117": {
-    "status": "no_pmcid",
-    "doi": "10.1016/s0022-5193(03)00072-9"
+    "status": "needs_manual",
+    "filename": "PMID12782117_Biochemical_and_genomic_regulation_of_the_trehalose_cycle_in_yeast__re.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5909646/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0022519303000729"
+    ],
+    "doi": "10.1016/s0022-5193(03)00072-9",
+    "pmcid": null
   },
   "http://identifiers.org/pubmed/20488988": {
     "status": "downloaded",
@@ -2527,27 +2872,54 @@
     "doi": "10.1126/science.1184913"
   },
   "http://identifiers.org/pubmed/12753937": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID12753937_Modeling_of_bone_formation_and_resorption_mediated_by_parathyroid_horm.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/7137810/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0303264703000406"
+    ],
     "doi": "10.1016/s0303-2647(03)00040-6",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/17497689": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID17497689_Sharp_developmental_thresholds_defined_through_bistability_by_antagoni.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/25573046/content",
+      "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/dvdy.21193",
+      "https://anatomypubs.onlinelibrary.wiley.com/doi/10.1002/dvdy.21193"
+    ],
     "doi": "10.1002/dvdy.21193",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/20406649": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID20406649_A_mathematical_model_of_parathyroid_hormone_response_to_acute_changes.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/14053640/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0025556410000556"
+    ],
     "doi": "10.1016/j.mbs.2010.04.001",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/15234198": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID15234198_Modeling_the_interactions_between_osteoblast_and_osteoclast_activities.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5910003/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/S0022519304001407"
+    ],
     "doi": "10.1016/j.jtbi.2004.03.023",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/15860557": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID15860557_Mathematical_model_of_paracrine_interactions_between_osteoclasts_and_o.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/37337566/content",
+      "https://academic.oup.com/endo/article-pdf/146/8/3589/9027483/endo3589.pdf",
+      "https://academic.oup.com/endo/article-lookup/doi/10.1210/en.2004-1642"
+    ],
     "doi": "10.1210/en.2004-1642",
     "pmcid": null
   },
@@ -2557,7 +2929,12 @@
     "pmcid": null
   },
   "http://identifiers.org/pubmed/14953444": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID14953444_The_mechanism_of_catalase_action__II__Electric_analog_computer_studies.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/18318738/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/0003986152901951"
+    ],
     "doi": "10.1016/0003-9861(52)90195-1",
     "pmcid": null
   },
@@ -2567,7 +2944,12 @@
     "pmcid": null
   },
   "http://identifiers.org/pubmed/3450367": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID3450367_METAMOD__software_for_steady-state_modelling_and_control_analysis_of_m.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/26912858/content",
+      "https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/2.4.243"
+    ],
     "doi": "10.1093/bioinformatics/2.4.243",
     "pmcid": null
   },
@@ -2578,17 +2960,31 @@
     "doi": "10.1007/s11538-010-9519-2"
   },
   "http://identifiers.org/pubmed/16307060": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID16307060_Mathematical_model_of_binding_of_albumin-bilirubin_complex_to_the_surf.pdf",
+    "manual_urls": [
+      "https://link.springer.com/article/10.1007/s10517-005-0491-z"
+    ],
     "doi": "10.1007/s10517-005-0491-z",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/7772723": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID7772723_Photosynthetic_oscillations_and_the_interdependence_of_photophosphoryl.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/7137151/content",
+      "https://linkinghub.elsevier.com/retrieve/pii/030326479401481L"
+    ],
     "doi": "10.1016/0303-2647(94)01481-l",
     "pmcid": null
   },
   "http://identifiers.org/pubmed/10643740": {
-    "status": "failed",
+    "status": "needs_manual",
+    "filename": "PMID10643740_Limit_cycle_models_for_circadian_rhythms_based_on_transcriptional_regu.pdf",
+    "manual_urls": [
+      "https://resolve.thirdiron.com/v2/articles/5071942/content",
+      "https://journals.sagepub.com/doi/10.1177/074873099129000948"
+    ],
     "doi": "10.1177/074873099129000948",
     "pmcid": null
   },
