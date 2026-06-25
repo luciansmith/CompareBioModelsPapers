@@ -9,15 +9,18 @@ in cookies.txt (refresh ~every 28 h via Cookie-Editor on research.ebsco.com).
 import re
 
 from strategy_utils import (
-    make_cookie_session, _follow_to_pdf, _prompt_cookies_refresh,
-    is_pdf, _NO_SUBSCRIPTION,
+    make_cookie_session, _prompt_cookies_refresh, is_pdf,
 )
 
 
 def try_ebsco(pmid_numeric, doi, path, verbose=False):
     """
     Try EBSCO Research full-text search API (UW Library).
-    Queries by DOI first, then PMID; fetches PDF via the v2-pdf linkprocessor.
+    Queries by DOI first, then PMID; fetches PDF via the v2-pdf linkprocessor
+    only. Doesn't chase the item's other embedded links (those can lead into
+    LibKey/Primo resolution, which the dedicated LibKey step already covers
+    cleanly) — if EBSCO itself doesn't have the PDF, this returns None and
+    lets the caller move on to the next strategy.
     """
     if not pmid_numeric and not doi:
         return None
@@ -64,14 +67,25 @@ def try_ebsco(pmid_numeric, doi, path, verbose=False):
             ct_s = rs.headers.get("content-type", "")
             vlog(f"EBSCO search status={rs.status_code} ct={ct_s} size={len(rs.content)}")
             if rs.status_code == 200 and "json" in ct_s:
-                cid = None
                 try:
                     jdata = rs.json()
                     items = jdata.get("search", {}).get("items", [])
                     vlog(f"EBSCO search items={len(items)}")
                     if verbose and items:
-                        print(f"      [ebsco] EBSCO first item keys: {list(items[0].keys())}")
-                        print(f"      [ebsco] EBSCO first item snippet: {__import__('json').dumps(items[0])[:600]}")
+                        # shortDbName/longDbName tells us which EBSCO database
+                        # matched -- "cmedm"/MEDLINE is the bibliographic citation
+                        # index (same metadata PubMed has), NOT a full-text
+                        # platform, so it'll always 404 on v2-pdf even though the
+                        # search "hit". holdingsAvailable + links are EBSCO's own
+                        # signal for whether any actual full-text holding exists
+                        # for this citation (possibly via a different database
+                        # or an OpenURL-style resolver link) -- worth seeing in
+                        # full since that's the one place a real access path
+                        # would show up if there is one.
+                        it0 = items[0]
+                        vlog(f"  item[0] db={it0.get('shortDbName')}/{it0.get('longDbName')} "
+                             f"holdingsAvailable={it0.get('holdingsAvailable')}")
+                        vlog(f"  item[0] links={it0.get('links')}")
                     cids = []
                     for item in items[:5]:
                         for fld in ("id", "recordId", "sourceRecordId",
@@ -88,46 +102,7 @@ def try_ebsco(pmid_numeric, doi, path, verbose=False):
                         for m in re.finditer(pat, rs.text):
                             cids.append(m.group(1))
 
-                _SKIP_LINK_TYPES = {
-                    "oneDriveUpload", "driveUpload", "driveUploadStatus",
-                    "csv", "email", "easybib", "refworks", "endnote",
-                    "noodletools", "ris", "cover", "thumb",
-                }
-                _FULLTEXT_BUCKETS = {
-                    "fullTextLinks", "v2-fullTextAndCustomLinks",
-                    "fullTextAndCustomLinks", "cardCallToActionLinks",
-                    "plinks", "providerLinks",
-                }
-                item_links = []
-                for item in items[:5]:
-                    raw_links = item.get("links") or {}
-                    if isinstance(raw_links, dict):
-                        buckets = [(k, v) for k, v in raw_links.items()
-                                   if k in _FULLTEXT_BUCKETS and isinstance(v, list)]
-                        if not buckets:
-                            buckets = [(k, v) for k, v in raw_links.items()
-                                       if isinstance(v, list)]
-                        for _bk, entries in buckets:
-                            for lnk in entries:
-                                if isinstance(lnk, str):
-                                    href = lnk
-                                    ltype = ""
-                                elif isinstance(lnk, dict):
-                                    if lnk.get("type") in _SKIP_LINK_TYPES:
-                                        continue
-                                    href = lnk.get("url") or lnk.get("href") or lnk.get("link") or ""
-                                    ltype = lnk.get("type", "")
-                                else:
-                                    continue
-                                if href and not href.startswith("http"):
-                                    href = "https://research.ebsco.com" + href
-                                if href and href.startswith("http") and href not in item_links:
-                                    item_links.append(href)
-                if verbose:
-                    print(f"      [ebsco] item links extracted: {item_links[:8]}")
-
                 vlog(f"EBSCO search cids={cids}")
-                v2pdf_404 = False
                 for cid in cids:
                     for intent in ("view", "download"):
                         eu = (
@@ -148,49 +123,19 @@ def try_ebsco(pmid_numeric, doi, path, verbose=False):
                             except Exception as e_w:
                                 vlog(f"write error: {e_w}")
                                 return None
-                        if r2.status_code == 404:
-                            v2pdf_404 = True
+                        elif verbose:
+                            # Show the actual error body -- v2-pdf returns JSON
+                            # even on failure, and the reason (no full text vs.
+                            # not entitled vs. something else) is in there.
+                            snippet = r2.content[:300].decode("utf-8", errors="replace")
+                            vlog(f"  v2-pdf body: {snippet}")
 
-                # v2-pdf unavailable — try the details API
-                if v2pdf_404 and cids:
-                    for cid in cids:
-                        try:
-                            first_item = next((i for i in items if i.get("id") == cid), items[0] if items else None)
-                            db = (first_item or {}).get("shortDbName") or (first_item or {}).get("shortDBName") or ""
-                            det_url = (
-                                f"https://research.ebsco.com/api/search/v2/details"
-                                f"?recordId={cid}&profileIdentifier={EBSCO_OPID}"
-                                + (f"&db={db}" if db else "")
-                            )
-                            rd = ebsco_sess.get(det_url, timeout=20,
-                                                headers={"Accept": "application/json",
-                                                         "Referer": f"https://research.ebsco.com/c/{EBSCO_OPID}/"})
-                            vlog(f"details API status={rd.status_code} ct={rd.headers.get('content-type','')} size={len(rd.content)}")
-                            if rd.status_code == 200 and "json" in rd.headers.get("content-type", ""):
-                                if verbose:
-                                    print(f"      [ebsco] details snippet: {rd.text[:800]}")
-                                for pat in (r'"(?:fullText|fullTextUrl|linkResolverUrl|pdfUrl|bestFullTextUrl|url)"\s*:\s*"([^"]+)"',
-                                            r'https?://[^\s"\'<>]+\.pdf[^\s"\'<>]*'):
-                                    for m in re.finditer(pat, rd.text):
-                                        candidate = m.group(1) if m.lastindex else m.group(0)
-                                        candidate = candidate.replace("\\u002F", "/").replace("\\/", "/")
-                                        if candidate.startswith("http"):
-                                            vlog(f"details link candidate: {candidate}")
-                                            result = _follow_to_pdf(candidate, "ebsco-details-link", path, verbose, sess=ebsco_sess)
-                                            if result and result is not _NO_SUBSCRIPTION:
-                                                return result
-                        except Exception as e_det:
-                            vlog(f"details API error: {e_det}")
-
-                # v2-pdf unavailable — try publisher links embedded in the result
-                if v2pdf_404 and item_links:
-                    vlog(f"v2-pdf returned 404; trying {len(item_links)} item link(s)")
-                    for href in item_links[:8]:
-                        vlog(f"trying item link: {href}")
-                        result = _follow_to_pdf(href, "ebsco-item-link", path, verbose, sess=ebsco_sess)
-                        if result and result is not _NO_SUBSCRIPTION:
-                            return result
-
+                # EBSCO's own v2-pdf delivery is the only thing this strategy
+                # uses. If it doesn't have the PDF, stop here — don't chase
+                # the item's other embedded links (details API / providerLinks
+                # etc.) through _follow_to_pdf, since those can wander into
+                # LibKey/Primo resolution and duplicate work the dedicated
+                # LibKey step already does cleanly.
                 if cids:
                     break
             else:

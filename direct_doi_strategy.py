@@ -13,7 +13,7 @@ from strategy_utils import (
     session, make_cookie_session,
     ezproxy_url, PUBLISHER_PDF_PATTERNS, pdf_url_from_doi,
     find_pdf_urls_in_html, _get_via_ezproxy, _is_ezproxy_login_wall,
-    is_pdf,
+    is_pdf, is_known_blocked_publisher,
 )
 
 
@@ -57,6 +57,18 @@ def try_direct_doi(doi, path, verbose=False):
     }
     doi_prefix = doi.split("/")[0] if "/" in doi else ""
     cookie_domain = _DOI_PREFIX_DOMAIN.get(doi_prefix, doi_prefix)
+    # NOTE: cookie_domain is only a *guess* from the DOI-prefix table above,
+    # not the actual resolved URL. Bailing out on the whole paper based on
+    # that guess -- before ever resolving anything -- risks giving up on a
+    # paper that actually lives at a different host (relocated/republished
+    # content, or a prefix shared with an imprint hosted elsewhere). The
+    # known-blocked-publisher check now runs against the real resolved URL
+    # ("final_url" below) once we have one, and even then only skips the
+    # sub-strategies (B and D) that would just re-hit that exact confirmed-
+    # blocked URL -- Strategy A (cheap, already in flight) and Strategy C
+    # (HTML scrape, which can surface a link to a genuinely different host)
+    # still get a chance.
+
     cookie_session = make_cookie_session(cookie_domain) if HAS_BROWSER_COOKIES else session
     if verbose:
         n_total = len(cookie_session.cookies)
@@ -112,22 +124,35 @@ def try_direct_doi(doi, path, verbose=False):
         if verbose:
             print(f"      [verbose] DOI redirect error: {e}")
 
+    # known_blocked is checked against the *actual* resolved URL -- ground
+    # truth, not the prefix guess -- so a paper whose DOI prefix suggests
+    # ScienceDirect but that actually resolved somewhere else won't get
+    # short-circuited here.
+    known_blocked = is_known_blocked_publisher(final_url)
+    if known_blocked and verbose:
+        print(f"      [verbose] {final_url} is a known-blocked publisher -- "
+              f"skipping the publisher-pattern guess and EZProxy re-attempt "
+              f"against this exact URL (0% historical success), but still "
+              f"trying an HTML-link scrape in case the page links out to a "
+              f"different host")
+
     # --- Strategy B: publisher pattern on resolved URL -----------------------
-    if verbose:
-        print(f"      [verbose] trying publisher patterns on {final_url}")
-    for domain, pdf_fn in PUBLISHER_PDF_PATTERNS.items():
-        if domain in final_url:
-            try:
-                pdf_url = pdf_fn(final_url, doi)
-                if try_url(pdf_url, referer=final_url):
-                    return pdf_url, None
-                ez = ezproxy_url(pdf_url)
-                if ez != pdf_url and try_url(ez, referer=final_url):
-                    return ez, None
-            except Exception as e:
-                if verbose:
-                    print(f"      [verbose] pattern error: {e}")
-            break
+    if not known_blocked:
+        if verbose:
+            print(f"      [verbose] trying publisher patterns on {final_url}")
+        for domain, pdf_fn in PUBLISHER_PDF_PATTERNS.items():
+            if domain in final_url:
+                try:
+                    pdf_url = pdf_fn(final_url, doi)
+                    if try_url(pdf_url, referer=final_url):
+                        return pdf_url, None
+                    ez = ezproxy_url(pdf_url)
+                    if ez != pdf_url and try_url(ez, referer=final_url):
+                        return ez, None
+                except Exception as e:
+                    if verbose:
+                        print(f"      [verbose] pattern error: {e}")
+                break
 
     # --- Strategy C: scrape article page HTML --------------------------------
     if html:
@@ -141,7 +166,11 @@ def try_direct_doi(doi, path, verbose=False):
                 return pdf_url, None
 
     # --- Strategy D: EZProxy on the resolved article page itself -------------
-    if final_url and final_url != f"https://doi.org/{doi}":
+    # Skipped when known_blocked -- this would just proxy the same confirmed-
+    # blocked URL through EZProxy, which the project's tracking history shows
+    # has a 0% success rate against these publishers (the block survives a
+    # cookie-loaded, UW-authenticated session just as well as an anonymous one).
+    if not known_blocked and final_url and final_url != f"https://doi.org/{doi}":
         ez_article_start = ezproxy_url(final_url)
         if ez_article_start != final_url:
             _vlog = (lambda msg: print(f"      [verbose] {msg}")) if verbose else (lambda msg: None)
@@ -186,4 +215,10 @@ def try_direct_doi(doi, path, verbose=False):
             if _ez_login_wall:
                 return None, final_url
 
+    if known_blocked:
+        # Strategy A and C (the only sub-strategies actually run against a
+        # confirmed-blocked host) both came up empty -- flag for manual
+        # download now, same end state as before, but only after genuinely
+        # trying the approaches that had a chance of finding a different URL.
+        return None, final_url
     return None, None
