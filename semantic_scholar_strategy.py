@@ -222,9 +222,12 @@ def try_semantic_scholar(doi, title, path, verbose=False, pmid=None):
             # requests as bot traffic even with a convincing User-Agent. Use
             # the same cookie-loaded session direct_doi_strategy relies on --
             # this is also what lets a UW-subscribed/EZProxy session through.
+            # See direct_doi_strategy.py's matching comment: make_cookie_session()
+            # always loads cookies.txt on its own; gating the call itself on
+            # HAS_BROWSER_COOKIES meant cookies.txt was silently never used
+            # whenever the optional browser_cookie3 package wasn't installed.
             cookie_domain = urlparse(r2.url).netloc
-            cookie_sess = (make_cookie_session(cookie_domain)
-                           if HAS_BROWSER_COOKIES else session)
+            cookie_sess = make_cookie_session(cookie_domain)
 
             tried_urls = set()
 

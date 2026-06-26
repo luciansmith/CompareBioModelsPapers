@@ -12,7 +12,8 @@ PDF yourself in a browser, drop it in a folder, and run this script to:
      already downloaded, that's reported as its own case rather than being
      silently matched against some other, worse-scoring candidate instead.
   3. Rename it to the project's standard PMID<id>_<title>.pdf convention
-     and copy it into "Biomodels papers/".
+     (or DOI<id>_<title>.pdf for papers with no real PubMed ID) and copy
+     it into "Biomodels papers/".
   4. Update download_tracking.json and biomd_publication_info_resolved.json
      the same way download_papers.py would (status=downloaded, source=manual).
 
@@ -23,139 +24,63 @@ singular/plural title variant), the PDF is left unmatched rather than
 risking a wrong assignment. See the "Euclid/purine" lesson documented in
 semantic_scholar_strategy.py's _titles_match() for why this matters.
 
+For PDFs where automatic matching just isn't reliable -- scanned/image-only
+pages with no extractable text, mangled metadata, or anything else that
+makes the title/synopsis scoring untrustworthy -- use --claim to tell the
+script directly which paper a specific file is. A claim skips the
+matching/scoring/ambiguity logic entirely for that file: it's trusted at
+face value (modulo the same "already downloaded" safety check every other
+match goes through). When any --claim is given, the run is restricted to
+just the claimed file(s) -- other PDFs sitting in the folder are left
+alone, not auto-matched.
+
+A claim's ID can be a bare PMID, a bare DOI, a full identifiers.org key,
+or (if none of those match) a paper TITLE -- in which case it's resolved
+by fuzzy-matching against every paper's title, accepted only on an exact
+match or a clear, unambiguous best match (see resolve_title_claim() in
+match_library.py).
+
 Usage:
   python match_manual_pdfs.py                  # scan manual_downloads/, dry run off
   python match_manual_pdfs.py --dry-run         # preview matches, write nothing
   python match_manual_pdfs.py --dir some/folder # scan a different folder
   python match_manual_pdfs.py --move            # delete the original after copying
   python match_manual_pdfs.py --threshold 0.85  # loosen/tighten match confidence
+  python match_manual_pdfs.py --claim scan.pdf=12345678
+  python match_manual_pdfs.py --claim scan.pdf=10.1016/j.cub.2022.04.016
+  python match_manual_pdfs.py --claim scan.pdf="A Scientific Paper Title"
+  python match_manual_pdfs.py --claim manual_downloads/scan.pdf=12345678
+                                                 # force scan.pdf to be this
+                                                 # paper, bypassing matching
+                                                 # (repeatable for multiple
+                                                 # files; only the claimed
+                                                 # files are processed --
+                                                 # a leading path before the
+                                                 # filename, e.g. from shell
+                                                 # tab-completion, is fine,
+                                                 # only the basename is used)
 
 Requirements:
   pip install pypdf
 """
 
 import argparse
-import difflib
 import re
 import shutil
 import sys
 from pathlib import Path
 
-try:
-    from pypdf import PdfReader
-except ImportError:
-    print("Missing dependency. Run:  pip install pypdf")
-    sys.exit(1)
-
 from strategy_utils import SCRIPT_DIR, OUTPUT_DIR, safe_filename, is_pdf
 from download_papers import (
     load_tracking, save_tracking, save_resolved, RESOLVED_FILE, TRACKING_FILE,
 )
+from match_library import (
+    THRESHOLD, AMBIGUITY_MARGIN,
+    extract_pdf_title_and_text, find_best_match, find_candidates,
+    load_synopsis_map, numeric_pmid, resolve_key, resolve_title_claim,
+)
 
 DEFAULT_INBOX = SCRIPT_DIR / "manual_downloads"
-
-THRESHOLD = 0.90
-AMBIGUITY_MARGIN = 0.03   # runner-up within this of the top score -> ambiguous
-DUP_TITLE_SIM = 0.92      # two candidate TITLES this similar to each other ->
-                          # don't trust noisy extracted text to tell them apart
-
-
-# ── Matching logic ───────────────────────────────────────────────────────────
-def _norm_title(t):
-    return re.sub(r'[^a-z0-9]+', ' ', (t or '').lower()).strip()
-
-
-def _score_candidate(norm_candidate_title, norm_meta_title, norm_page_text):
-    if not norm_candidate_title:
-        return 0.0
-    score = 0.0
-    if norm_meta_title:
-        score = max(score, difflib.SequenceMatcher(
-            None, norm_candidate_title, norm_meta_title).ratio())
-    if norm_page_text and norm_candidate_title in norm_page_text:
-        score = max(score, 0.97)
-    return score
-
-
-def find_best_match(meta_title, page_text, candidates, threshold=THRESHOLD,
-                     dup_title_sim=DUP_TITLE_SIM, ambiguity_margin=AMBIGUITY_MARGIN):
-    """
-    candidates: list of (key, info, title)
-    Returns (best_or_None, scored_list, ambiguous_with_or_None).
-    scored_list is every candidate, sorted best-first, as (score, key, info, title).
-    If ambiguous_with_or_None is set, best_or_None is None even if something
-    scored above threshold -- caller should treat this PDF as needing a human
-    to disambiguate rather than guessing.
-    """
-    norm_meta = _norm_title(meta_title) if meta_title else ""
-    norm_text = _norm_title(page_text) if page_text else ""
-
-    scored = []
-    for key, info, title in candidates:
-        nt = _norm_title(title)
-        score = _score_candidate(nt, norm_meta, norm_text)
-        scored.append((score, key, info, title, nt))
-
-    scored.sort(key=lambda t: -t[0])
-    public_scored = [(s, k, i, t) for (s, k, i, t, _nt) in scored]
-
-    if not scored or scored[0][0] < threshold:
-        return None, public_scored, None
-
-    top = scored[0]
-    for cand in scored[1:]:
-        score_gap_ambiguous = (cand[0] >= threshold
-                                and (top[0] - cand[0]) < ambiguity_margin)
-        title_dup_ambiguous = (
-            difflib.SequenceMatcher(None, top[4], cand[4]).ratio() >= dup_title_sim
-        )
-        if score_gap_ambiguous or title_dup_ambiguous:
-            return None, public_scored, (cand[0], cand[1], cand[2], cand[3])
-
-    return (top[0], top[1], top[2], top[3]), public_scored, None
-
-
-# ── PDF reading ──────────────────────────────────────────────────────────────
-def extract_pdf_title_and_text(path, max_pages=2):
-    """Returns (metadata_title_or_None, page_text_or_empty_string)."""
-    meta_title = None
-    page_text = ""
-    try:
-        reader = PdfReader(str(path))
-        if reader.metadata and reader.metadata.title:
-            meta_title = str(reader.metadata.title).strip() or None
-        for page in reader.pages[:max_pages]:
-            page_text += (page.extract_text() or "") + "\n"
-    except Exception as e:
-        print(f"    [read error] {e}")
-    return meta_title, page_text
-
-
-# ── Candidate set ────────────────────────────────────────────────────────────
-def find_candidates(data):
-    """
-    Every paper with a usable title, downloaded or not.
-
-    Downloaded papers are deliberately kept in the pool: if a PDF's true
-    best match is a paper that's already downloaded, we want to detect and
-    report that specifically, not silently let it match some other,
-    worse-scoring, not-yet-downloaded paper instead.
-    """
-    candidates = []
-    for key, info in data.items():
-        title = info.get("title", "")
-        if not title:
-            continue
-        candidates.append((key, info, title))
-    return candidates
-
-
-def numeric_pmid(key, info):
-    numeric_id = re.sub(r'^https?://identifiers\.org/pubmed/', '', key)
-    numeric_id = re.sub(r'^https?://identifiers\.org/doi/', '', numeric_id)
-    if not re.match(r'^\d+$', numeric_id):
-        numeric_id = None
-    return info.get("pmid") or numeric_id
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -173,7 +98,30 @@ def main():
                              "(default: leave it in place).")
     parser.add_argument("--threshold", type=float, default=THRESHOLD,
                         help=f"Minimum match confidence, 0-1 (default {THRESHOLD}).")
+    parser.add_argument("--claim", action="append", default=[], metavar="FILE=ID",
+                        help="Force-match FILE (by name, inside --dir -- a "
+                             "leading path, e.g. manual_downloads/scan.pdf, "
+                             "is accepted and ignored, so tab-completion "
+                             "works) to the paper identified by ID, skipping "
+                             "automatic title/synopsis matching for that "
+                             "file. ID can be a bare PMID, a bare DOI, a "
+                             "full identifiers.org key, or a paper title "
+                             "(matched exactly or, failing that, by a clear "
+                             "best fuzzy match). Repeatable. When any "
+                             "--claim is given, only the claimed file(s) "
+                             "are processed.")
     args = parser.parse_args()
+
+    claims = {}
+    for spec in args.claim:
+        if "=" not in spec:
+            print(f"ERROR: --claim {spec!r} isn't in FILE=ID form.")
+            sys.exit(1)
+        fname, ident = spec.split("=", 1)
+        # Accept a leading path (e.g. tab-completed "manual_downloads/scan.pdf")
+        # and match on the basename only -- claims are always looked up
+        # against pdf_path.name, never a full path.
+        claims[Path(fname.strip()).name] = ident.strip()
 
     inbox = args.dir
     if not inbox.exists():
@@ -182,9 +130,22 @@ def main():
         print("Drop manually-downloaded PDFs there and re-run.")
         return
 
-    pdfs = sorted(inbox.glob("*.pdf"))
+    all_pdfs = sorted(inbox.glob("*.pdf"))
+    if claims:
+        # --claim given: process only the claimed files, full stop. Don't
+        # run automatic matching over the rest of the folder just because
+        # it happens to be there.
+        pdfs = [p for p in all_pdfs if p.name in claims]
+        print(f"--claim given: processing only {len(pdfs)} claimed file(s), "
+              f"ignoring {len(all_pdfs) - len(pdfs)} other PDF(s) in {inbox}.\n")
+    else:
+        pdfs = all_pdfs
+
     if not pdfs:
-        print(f"No PDFs found in {inbox}")
+        if claims:
+            print(f"None of the --claim filenames were found in {inbox}.")
+        else:
+            print(f"No PDFs found in {inbox}")
         return
 
     if not RESOLVED_FILE.exists():
@@ -194,13 +155,23 @@ def main():
     import json
     data = json.loads(RESOLVED_FILE.read_text(encoding="utf-8"))
     tracking = load_tracking()
-    candidates = find_candidates(data)
-    print(f"Candidates (have a title): {len(candidates)}")
+
+    if claims:
+        # Claimed files skip matching entirely -- no need to build the
+        # candidate/synopsis pool.
+        synopsis_map, candidates = {}, []
+    else:
+        synopsis_map = load_synopsis_map()
+        candidates = find_candidates(data, synopsis_map)
+        print(f"Candidates (have a title): {len(candidates)}")
+        print(f"Candidates with a synopsis: "
+              f"{sum(1 for c in candidates if c[3])}")
+
     print(f"PDFs to check in {inbox}: {len(pdfs)}\n")
 
     OUTPUT_DIR.mkdir(exist_ok=True)
 
-    matched = skipped = ambiguous = already_downloaded = 0
+    matched = skipped = ambiguous = already_downloaded = claimed = 0
 
     for pdf_path in pdfs:
         print(f"{pdf_path.name}")
@@ -213,48 +184,93 @@ def main():
         if meta_title:
             print(f"    metadata title: {meta_title[:90]!r}")
 
-        best, scored, ambig = find_best_match(meta_title, page_text, candidates,
-                                               threshold=args.threshold)
+        claim_id = claims.pop(pdf_path.name, None)
+        is_claim = claim_id is not None
 
-        if ambig is not None:
-            score, key, info, title = scored[0] if scored else (0, None, None, None)
-            print(f"    AMBIGUOUS -- top candidates are too close/too similar to "
-                  f"trust automatic matching:")
-            for s, k, i, t in scored[:3]:
-                print(f"      {s:.3f}  {t[:90]!r}  ({k})")
-            print("    Skipping. Rename/move this one manually if you know which it is.")
-            ambiguous += 1
-            continue
+        if is_claim:
+            # --claim: trust the human's identification outright and skip
+            # the title/synopsis matching and ambiguity-detection entirely
+            # -- for PDFs (scans, mangled metadata, etc.) where that logic
+            # just can't be trusted to get it right. Try claim_id as an ID
+            # first (PMID/DOI/identifiers.org key); if that doesn't match
+            # anything, fall back to treating it as a title.
+            key = resolve_key(data, claim_id)
+            title_candidates = None
+            if key is None:
+                key, title_candidates = resolve_title_claim(data, claim_id)
+            if key is None:
+                print(f"    CLAIM ERROR: {claim_id!r} doesn't match any "
+                      f"paper in {RESOLVED_FILE.name} (tried as an ID and "
+                      f"as a title) -- skipping this file.")
+                if title_candidates:
+                    print(f"    Closest title(s) found:")
+                    for ratio, k, t in title_candidates[:3]:
+                        print(f"      {ratio:.3f}  {t[:90]!r}  ({k})")
+                skipped += 1
+                continue
+            info = data[key]
+            title = info.get("title") or "(no title on file)"
+            match_label = f"CLAIMED as {claim_id!r}"
+        else:
+            best, scored, ambig = find_best_match(meta_title, page_text, candidates,
+                                                   threshold=args.threshold)
 
-        if best is None:
-            print("    no confident match")
-            if scored:
-                top = scored[0]
-                print(f"      best guess was {top[0]:.3f}  {top[3][:90]!r}  ({top[1]})")
-            skipped += 1
-            continue
+            if ambig is not None:
+                score, key, info, title = scored[0] if scored else (0, None, None, None)
+                print(f"    AMBIGUOUS -- top candidates are too close/too similar to "
+                      f"trust automatic matching:")
+                for s, k, i, t in scored[:3]:
+                    print(f"      {s:.3f}  {t[:90]!r}  ({k})")
+                print(f"    Skipping. Rename/move this one manually if you know "
+                      f"which it is, or re-run with "
+                      f"--claim {pdf_path.name}=<pmid-or-doi> if you're sure.")
+                ambiguous += 1
+                continue
 
-        score, key, info, title = best
+            if best is None:
+                print("    no confident match")
+                if scored:
+                    top = scored[0]
+                    print(f"      best guess was {top[0]:.3f}  {top[3][:90]!r}  ({top[1]})")
+                print(f"    If you know which paper this is, re-run with "
+                      f"--claim {pdf_path.name}=<pmid-or-doi>.")
+                skipped += 1
+                continue
+
+            score, key, info, title = best
+            match_label = f"MATCH ({score:.3f})"
 
         existing = tracking.get(key, {})
         if existing.get("status") == "downloaded":
-            print(f"    ALREADY DOWNLOADED ({score:.3f}): {title[:90]!r}")
+            print(f"    ALREADY DOWNLOADED ({match_label}): {title[:90]!r}")
             print(f"    -> already have this one as "
                   f"{existing.get('filename', '(filename unknown)')} in "
                   f"{OUTPUT_DIR.name}/; not copying or touching tracking.")
             already_downloaded += 1
             continue
 
+        # Prefer a real PMID for the filename; fall back to the DOI under a
+        # "DOI" prefix when this paper has no real PubMed ID, instead of
+        # mislabeling a DOI-only paper "PMID<doi>" (or, if even the DOI is
+        # missing, falling back to the raw tracking key).
         pmid_num = numeric_pmid(key, info)
-        new_filename = safe_filename(pmid_num, title)
+        doi = info.get("doi")
+        if pmid_num:
+            new_filename = safe_filename(pmid_num, title, id_label="PMID")
+        elif doi:
+            new_filename = safe_filename(doi, title, id_label="DOI")
+        else:
+            new_filename = safe_filename(key, title, id_label="PMID")
         dest = OUTPUT_DIR / new_filename
 
-        print(f"    MATCH ({score:.3f}): {title[:90]!r}")
+        print(f"    {match_label}: {title[:90]!r}  ({key})")
         print(f"    -> {dest}")
 
         if args.dry_run:
             print("    [dry run] would copy + update tracking, no changes made")
             matched += 1
+            if is_claim:
+                claimed += 1
             continue
 
         shutil.copy2(pdf_path, dest)
@@ -271,8 +287,17 @@ def main():
         save_tracking(tracking, key)
         save_resolved(data, key, tracking[key])
         matched += 1
+        if is_claim:
+            claimed += 1
 
-    print(f"\nDone. {matched} matched, {already_downloaded} already downloaded, "
+    if claims:
+        print(f"\nWARNING: {len(claims)} --claim entry(ies) didn't match any "
+              f"PDF actually found in {inbox}:")
+        for fname, ident in claims.items():
+            print(f"    {fname} = {ident}")
+
+    print(f"\nDone. {matched} matched ({claimed} by --claim), "
+          f"{already_downloaded} already downloaded, "
           f"{ambiguous} ambiguous, {skipped} skipped/unmatched.")
     if args.dry_run:
         print("(dry run -- nothing was written)")

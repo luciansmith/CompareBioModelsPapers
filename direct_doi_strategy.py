@@ -13,7 +13,7 @@ from strategy_utils import (
     session, make_cookie_session,
     ezproxy_url, PUBLISHER_PDF_PATTERNS, pdf_url_from_doi,
     find_pdf_urls_in_html, _get_via_ezproxy, _is_ezproxy_login_wall,
-    is_pdf, is_known_blocked_publisher,
+    is_pdf, is_known_blocked_publisher, is_cloudflare_challenge,
 )
 
 
@@ -54,6 +54,7 @@ def try_direct_doi(doi, path, verbose=False):
         "10.1128":  ".asm.org",
         "10.1104":  ".plantphysiol.org",
         "10.1105":  ".plantcell.org",
+        "10.1021":  ".pubs.acs.org",
     }
     doi_prefix = doi.split("/")[0] if "/" in doi else ""
     cookie_domain = _DOI_PREFIX_DOMAIN.get(doi_prefix, doi_prefix)
@@ -69,7 +70,18 @@ def try_direct_doi(doi, path, verbose=False):
     # (HTML scrape, which can surface a link to a genuinely different host)
     # still get a chance.
 
-    cookie_session = make_cookie_session(cookie_domain) if HAS_BROWSER_COOKIES else session
+    # make_cookie_session() always loads cookies.txt (a real, manually-exported
+    # session -- including things like Cloudflare cf_clearance tokens or
+    # EZProxy session cookies) regardless of whether the optional
+    # browser_cookie3 package is installed; browser_cookie3 (live-reading the
+    # local browser's cookie store) is only a *supplementary* source that
+    # make_cookie_session() itself separately gates on HAS_BROWSER_COOKIES.
+    # Gating the whole call on HAS_BROWSER_COOKIES here was a bug: when
+    # browser_cookie3 isn't installed, it fell back to a cookie-less `session`
+    # and silently never sent cookies.txt's cookies at all -- e.g. an
+    # unexpired pubs.acs.org cf_clearance cookie sitting right there in
+    # cookies.txt was never used.
+    cookie_session = make_cookie_session(cookie_domain)
     if verbose:
         n_total = len(cookie_session.cookies)
         has_file = COOKIES_FILE.exists()
@@ -88,6 +100,11 @@ def try_direct_doi(doi, path, verbose=False):
             if verbose:
                 ct2 = r2.headers.get("content-type", "")
                 print(f"      [verbose]   -> {pdf_url}  status={r2.status_code}  ct={ct2}  size={len(r2.content)}  is_pdf={is_pdf(r2.content)}")
+                if is_cloudflare_challenge(r2):
+                    print(f"      [verbose]   -> blocked by Cloudflare's managed JS challenge "
+                          f"(cf_clearance in cookies.txt is missing/expired/fingerprint-"
+                          f"mismatched for this client) -- not solvable by this script; "
+                          f"needs a fresh browser visit + cookies.txt re-export")
             if r2.status_code == 200 and is_pdf(r2.content):
                 path.write_bytes(r2.content)
                 return True
@@ -114,6 +131,11 @@ def try_direct_doi(doi, path, verbose=False):
         if verbose:
             ct = r.headers.get("content-type", "")
             print(f"\n      [verbose] DOI resolved to {r.url}  status={r.status_code}  content-type={ct}  size={len(r.content)}")
+            if is_cloudflare_challenge(r):
+                print(f"      [verbose] blocked by Cloudflare's managed JS challenge "
+                      f"(cf_clearance in cookies.txt is missing/expired/fingerprint-"
+                      f"mismatched for this client) -- not solvable by this script; "
+                      f"needs a fresh browser visit + cookies.txt re-export")
         final_url = r.url
         if r.status_code == 200 and is_pdf(r.content):
             path.write_bytes(r.content)

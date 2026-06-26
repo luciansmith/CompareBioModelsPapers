@@ -177,7 +177,18 @@ def download_paper(pmid, title, pmc_info, tracking, tracking_key,
     if pmc_only and not pmcid:
         return None
 
-    filename     = safe_filename(pmid_numeric, title)
+    # Filename: prefer a real PMID. A paper with no real PubMed ID (a
+    # doi/-keyed entry that resolve_ids.py couldn't map to a PMID) falls
+    # back to pmid_numeric = pmid above, which is just the raw tracking
+    # key (e.g. a full "http://identifiers.org/doi/10.1016/..." string) --
+    # labeling that "PMID<...>" would be wrong, so use the DOI itself
+    # under a "DOI" prefix instead when there's no real PMID to use.
+    if pmc_info.get("pmid_numeric"):
+        filename = safe_filename(pmc_info["pmid_numeric"], title, id_label="PMID")
+    elif doi:
+        filename = safe_filename(doi, title, id_label="DOI")
+    else:
+        filename = safe_filename(pmid_numeric, title, id_label="PMID")
     path         = OUTPUT_DIR / filename
     # Manual-download candidates a previous run already recorded for this
     # paper, if any -- merged below with whatever this run finds, so a rerun

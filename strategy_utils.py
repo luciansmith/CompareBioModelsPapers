@@ -288,11 +288,19 @@ def is_known_blocked_publisher(url_or_domain):
     return any(d in url_or_domain.lower() for d in KNOWN_BLOCKED_PUBLISHER_DOMAINS)
 
 
-def safe_filename(pmid, title):
-    clean_id = re.sub(r"[^\w.-]", "_", str(pmid))
+def safe_filename(identifier, title, id_label="PMID"):
+    """Build the project's standard "<id_label><id>_<title>.pdf" filename.
+
+    id_label defaults to "PMID" for backward compatibility, but callers
+    should pass id_label="DOI" when `identifier` is a DOI rather than a
+    real PubMed ID -- otherwise a DOI-only paper ends up with a misleading
+    filename like "PMID10.1016_j.something..." that looks like a PMID but
+    isn't one.
+    """
+    clean_id = re.sub(r"[^\w.-]", "_", str(identifier))
     clean = re.sub(r"[^\w\s-]", "_", title[:70]).strip()
     clean = re.sub(r"\s+", "_", clean)
-    return f"PMID{clean_id}_{clean}.pdf"
+    return f"{id_label}{clean_id}_{clean}.pdf"
 
 
 def find_pdf_urls_in_html(html, base_url):
@@ -462,6 +470,7 @@ PUBLISHER_PDF_PATTERNS = {
     "www.g3journal.org":          lambda u, d: re.sub(r"/doi/", "/doi/pdf/", u),
     "genetics.org":               lambda u, d: u + ".full.pdf",
     "www.genetics.org":           lambda u, d: u + ".full.pdf",
+    "pubs.acs.org":               lambda u, d: re.sub(r"/doi/(abs/|full/)?", "/doi/pdf/", u),
 }
 
 
@@ -487,6 +496,8 @@ def pdf_url_from_doi(doi):
         _add(f"https://www.sciencedirect.com/science/article/pii/{pii}/pdfft?isDTMRedir=true&download=true")
     if d.startswith("10.1007/"):
         _add(f"https://link.springer.com/content/pdf/{doi}.pdf")
+    if d.startswith("10.1021/"):
+        _add(f"https://pubs.acs.org/doi/pdf/{doi}")
     return candidates
 
 # ── Primo/Alma OpenURL fallback (no JS execution) ────────────────────────────
